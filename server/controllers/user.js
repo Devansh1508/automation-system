@@ -1,15 +1,62 @@
 const userModel=require('../models/user');
 const bcrypt=require('bcrypt');
+const otpGenerator=require('otp-generator');
+const otpModel=require('../models/otp');
 const jwt=require('jsonwebtoken');
+const mailSender = require('../utils/mailSender');
 require('dotenv').config();
+
+exports.sendOtp = async (req, res) => {
+  try{
+    const { email } = req.body;
+
+    const userExist=await userModel.findOne({email:email});
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "email is required",
+      });
+    }
+
+    if(userExist){
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    var otp=otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
+    var otpExist=await otpModel.findOne({otp:otp});
+    while(otpExist){
+      otp=otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
+      otpExist=await otpModel.findOne({otp:otp});
+    }
+
+    const otpEntry = await otpModel.create({ email: email, otp: otp });
+    console.log("otpEntry", otpEntry);
+
+    await mailSender(email,"OTP",otp);
+
+    res.status(200).json({
+      success: true,
+      message: "otp sent successfully",
+    });
+  }catch(err){
+    return res.status(500).json({
+      success: false,
+      message: "error occurred while sending otp",
+    })
+  }
+}
 
 exports.signUp = async (req, res) => {
     try {
         // fetch data from req.body 
-        const { email, password, confirmPassword, firstName, lastName, accountType } = req.body;
+        const { email, password, confirmPassword, firstName, lastName,otp, accountType } = req.body;
 
         // validate krlo 
-        if (!firstName || !lastName || !email || !password|| !confirmPassword || !accountType) {
+        if (!firstName || !lastName || !email || !password|| !confirmPassword || !accountType || !otp) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
 
@@ -31,20 +78,20 @@ exports.signUp = async (req, res) => {
         }
 
         // checking most recent otp 
-        // const recentOtp = await otpModel.findOne({ email: email }).sort({ timeStamps: -1 }).limit(1);
-        // console.log("recent otpEntry", recentOtp);
+        const recentOtp = await otpModel.findOne({ email: email }).sort({ timeStamps: -1 }).limit(1);
+        console.log("recent otpEntry", recentOtp);
 
-        // if (recentOtp.length === 0) {
-        //     return res.status(401).json({
-        //         success: false,
-        //         message: "OTP not found"
-        //     });
-        // } else if (recentOtp.otp !== otp) {
-        //     return res.status(401).json({
-        //         success: false,
-        //         message: "OTP does not match"
-        //     });
-        // }
+        if (recentOtp.length === 0) {
+            return res.status(401).json({
+                success: false,
+                message: "OTP not found"
+            });
+        } else if (recentOtp.otp !== otp) {
+            return res.status(401).json({
+                success: false,
+                message: "OTP does not match"
+            });
+        }
 
         // hash the password 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -100,7 +147,7 @@ exports.login = async (req, res) => {
           accountType: user.accountType,
         };
         const token =await jwt.sign(payload, process.env.JWT_SECRET, {
-          expiresIn: "2h",
+          expiresIn: "3d",
         });
   
         // create cookie and send response 
@@ -111,7 +158,7 @@ exports.login = async (req, res) => {
         res.cookie("token", token, options).status(200).json({
           success: true,
           token,
-          user,
+          // user,
           message: "login successful",
         });
       } else {

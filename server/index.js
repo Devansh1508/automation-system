@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('./config/database');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
+const {cloudinaryConnect}=require('./config/cloudinary');
 require('dotenv').config();
 
 const app = express();
@@ -12,8 +13,9 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 })
 
-// database connection 
+//  connecting with different services
 db.connect();
+cloudinaryConnect();
 
 // middleware 
 app.use(express.json());
@@ -25,6 +27,7 @@ app.use(
     })
 );
 
+// testing route 
 app.get('/', (req, res) => {
     res.send("Welcome to the automation system server");
 })

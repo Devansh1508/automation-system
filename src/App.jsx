@@ -1,6 +1,7 @@
 import React from 'react'
 import Signup from './pages/Signup'
 import Login from './pages/Login'
+import OtpGenerate from './pages/OtpGenerate'
 import { Routes,Route } from 'react-router-dom'
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
         {/* <Route path="/" element={<Home />} /> */}
         <Route path="/Signup" element={<Signup />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/Otp" element={<OtpGenerate />} />
       </Routes>
     </div>
     

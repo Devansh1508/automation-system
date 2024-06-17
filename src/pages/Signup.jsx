@@ -6,17 +6,36 @@ import img4 from "../assets/images/Login/pic-4.jpg";
 import img5 from "../assets/images/Login/pic-5.jpg";
 import img6 from "../assets/images/Login/pic-6.jpg";
 import { useForm } from "react-hook-form";
-import { useState} from "react";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast, Flip } from 'react-toastify';
+import { useState } from "react";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast, Flip } from "react-toastify";
+import { generate } from "otp-generator";
 
 const arr = [img1, img2, img3, img4, img5, img6];
 const randomImg = arr[Math.floor(Math.random() * arr.length)];
 
 const Signup = () => {
+  // const [color, setColor] = useState("bg-[#E9A246]");
+  // const [Otpcolor, setotpColor] = useState("bg-[#E9A246]");
+
+  // const buttonClick = () => {
+  //   setColor("bg-[#F6F3EF]");
+  //   setTimeout(() => {
+  //     // if(color==="bg-[#E9A246]")
+  //       setColor("bg-[#E9A246]")
+  // },100);
+  // };
+  // const buttonClick = () => {
+  //   setColor("bg-[#F6F3EF]");
+  //   setTimeout(() => {
+  //     // if(color==="bg-[#E9A246]")
+  //       setColor("bg-[#E9A246]")
+  // },100);
+  // };
+
   const [user, setUser] = useState({
     email: "",
-    // otp: "",
+    otp: "",
     password: "",
     firstName: "",
     lastName: "",
@@ -36,23 +55,22 @@ const Signup = () => {
       });
 
       // notification
-      if(response.ok)notify();
+      if (response.ok) notify("🎉 Signup successfull!");
       else {
         const responseBody = await response.json();
         errorMessage(responseBody.message);
       }
-      
-      console.log("res:", response);
+      // console.log("res:", respons);
     } catch (err) {
       console.log("register/signup", err);
     }
   };
 
-  useEffect(() => {
-    console.log("from use ref", user);
-  }, [user]);
+  // useEffect(() => {
+  //   console.log("from use ref", user);
+  // }, [user]);
 
-  const onSubmit = async (data, e) => {
+  const onSubmit = async (data, e) => { 
     await setUser({ ...data });
     await registerUser(data, e);
     console.log("user", user);
@@ -65,19 +83,21 @@ const Signup = () => {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  const notify = () => toast.success('🎉 Signup successfull!', {
-    position: "top-right",
-    autoClose: 2000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "dark",
-    transition: Flip,
+  const notify = (message) =>
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Flip,
     });
 
-    const errorMessage = (message)=> toast.error(`${message}`, {
+  const errorMessage = (message) =>
+    toast.error(`${message}`, {
       position: "top-center",
       autoClose: 2000,
       hideProgressBar: false,
@@ -87,7 +107,7 @@ const Signup = () => {
       progress: undefined,
       theme: "colored",
       transition: Flip,
-      });
+    });
 
   return (
     <div className="flex justify-center items-center">
@@ -106,20 +126,20 @@ const Signup = () => {
             <div>
               <form
                 action=""
-                className="flex flex-col font-[Oswald] max-[800px]:text-[12px]"
+                className="flex flex-col w-[100%] font-[Oswald] max-[800px]:text-[12px]"
                 onSubmit={handleSubmit(onSubmit)}
               >
-                <select {...register("accountType",{required})}>
-          <option value="HOD">HOD</option>
-          <option value="Registrar">Registrar</option>
-          <option value="Other">Other</option>
-        </select>
+                <select {...register("accountType",)}>
+                  <option value="HOD">HOD</option>
+                  <option value="Registrar">Registrar</option>
+                  <option value="Other">Other</option>
+                </select>
 
                 <input
                   className="m-1 border-2 flex justify-center items-center p-[1px] rounded-xl"
                   type="text"
                   // onChange={handleChange}
-                  {...register("firstName", { required: true })}
+                  {...register("firstName",)}
                   placeholder="firstName"
                 />
 
@@ -127,7 +147,7 @@ const Signup = () => {
                   className="m-1 border-2 flex justify-center items-center p-[1px] rounded-xl"
                   type="text"
                   // onChange={handleChange}
-                  {...register("lastName", { required: true })}
+                  {...register("lastName",)}
                   placeholder="lastName"
                 />
 
@@ -135,23 +155,29 @@ const Signup = () => {
                   className="m-1 border-2 flex justify-center items-center p-[1px] rounded-xl"
                   type="email"
                   // onChange={handleChange}
-                  {...register("email", { required: true })}
+                  {...register("email",)}
                   placeholder="email"
                 />
 
-                {/* <input
-          className="m-1 border-2 flex justify-center items-center p-[1px] rounded-xl"
-          type="text"
-          // onChange={handleChange}
-          {...register("otp", { required: true })}
-          placeholder="otp"
-        /> */}
+                <div className="flex flex-row gap-5 justify-center items-center">
+                  <input
+                    className="m-1 border-2 flex justify-center items-center p-[1px] rounded-xl"
+                    type="text"
+                    // onChange={handleChange}
+                    {...register("otp",)}
+                    placeholder="otp" 
+                  />
+
+                  <a href="./otp" className="bg-[#E9A246] rounded-md p-[3px] transition-all duration-200 hover:scale-95 onhover:scale-95">
+                    generate otp
+                  </a>
+                </div>
 
                 <input
                   className="m-1 border-2 flex justify-center items-center p-[1px] rounded-xl"
                   type="password"
                   // onChange={handleChange}
-                  {...register("password", { required: true })}
+                  {...register("password")}
                   placeholder="password"
                 />
 
@@ -159,15 +185,16 @@ const Signup = () => {
                   className="m-1 border-2 flex justify-center items-center p-[1px] rounded-xl"
                   type="password"
                   // onChange={handleChange}
-                  {...register("confirmPassword", { required: true })}
+                  {...register("confirmPassword")}
                   placeholder="confirmPassword"
                 />
 
                 <input
-                  className="text-center transition-all duration-200 hover:scale-95 px-6 py-2 shadow-xl rounded-md onhover:scale-95 font-bold m-3 bg-[#E5A105]"
+                  className={`text-center transition-all duration-200 hover:scale-95 px-6 py-2 shadow-xl rounded-md bg-[#E9A246] onhover:scale-95 font-bold m-3`}
                   disabled={isSubmitting}
                   type="Submit"
                   name="Submit"
+                  // onClick={buttonClick}
                 />
               </form>
               <ToastContainer />

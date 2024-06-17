@@ -58,7 +58,7 @@ const Login = () => {
   };
 
   const notify = () =>
-    toast.success("🎉 Signup successfull!", {
+    toast.success("🎉 Login successfull!", {
       position: "top-right",
       autoClose: 2000,
       hideProgressBar: false,
@@ -108,14 +108,12 @@ const Login = () => {
               <input
                 className={styling}
                 type="text"
-                {...register("email", {
-                  required: true,
-                })}
+                {...register("email")}
               />
               <input
                 className={styling}
                 type="password"
-                {...register("password", { required: true })}
+                {...register("password")}
               />
               <input
                 className="text-center transition-all duration-200 hover:scale-95 px-6 py-2 shadow-xl rounded-md onhover:scale-95 font-bold m-3 bg-[#E5A105]"

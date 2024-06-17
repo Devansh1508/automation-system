@@ -32,7 +32,14 @@ const userSchema = new Schema({
     },
     post:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Post'
+        ref:'post'
+    },
+    token:{
+        type:String,
+    },
+    otp:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'otp',
     }
 });
 
