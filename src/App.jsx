@@ -1,23 +1,55 @@
-import React from 'react'
-import Signup from './pages/Signup'
-import Login from './pages/Login'
-import OtpGenerate from './pages/OtpGenerate'
-import { Routes,Route } from 'react-router-dom'
+import React from "react";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import Home from "./pages/Home";
+import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
+import OtpGenerate from "./pages/OtpGenerate";
+import OpenRoute from "./components/common/OpenRoute";
+import { Routes, Route } from "react-router-dom";
+import ChangePassword from "./pages/ChangePassword";
 
 function App() {
-
   return (
     <div>
-      {/* <h1>hello</h1> */}
       <Routes>
-        {/* <Route path="/" element={<Home />} /> */}
-        <Route path="/Signup" element={<Signup />} />
-        <Route path="/Login" element={<Login />} />
+        <Route
+          path="/Signup"
+          element={
+            <OpenRoute>
+              <Signup />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="/Login"
+          element={
+            <OpenRoute>
+              <Login />
+            </OpenRoute>
+          }
+        />
         <Route path="/Otp" element={<OtpGenerate />} />
+        <Route path="/Profile" element={<Profile />} />
+        <Route path="/" element={<Home />} />
+        <Route
+          path="ForgotPassword"
+          element={
+              <ForgotPassword />
+          }
+        />
+        <Route
+          path="update-password/:id"
+          element={
+            <OpenRoute>
+              <ChangePassword />
+            </OpenRoute>
+          }
+        />
       </Routes>
+
     </div>
-    
-  )
+  );
 }
 
-export default App
+export default App;

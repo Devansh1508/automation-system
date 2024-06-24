@@ -1,0 +1,9 @@
+.styling {
+  margin: 0.25rem;
+  border-width: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1px;
+  border-radius: 0.75rem;
+}

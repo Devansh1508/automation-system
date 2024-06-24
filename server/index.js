@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('./config/database');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');  
 const {cloudinaryConnect}=require('./config/cloudinary');
 require('dotenv').config();
 
@@ -34,3 +35,4 @@ app.get('/', (req, res) => {
 
 // routes 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/profile', profileRoutes);

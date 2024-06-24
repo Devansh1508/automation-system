@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { set, useForm } from "react-hook-form";
-import "./otp.css";
+import "./css/otp.css";
 import otp from "../assets/images/otp.svg";
 import { ToastContainer, toast, Flip } from "react-toastify";
 

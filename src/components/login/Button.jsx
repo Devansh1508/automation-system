@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Button = (props) => {
   return (
-    <Link to={props.link}>
+      <Link to={props.link}>
       <div>
         <div
           style={{ backgroundColor: props.color, color: props.textColor }}

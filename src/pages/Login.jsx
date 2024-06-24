@@ -8,21 +8,10 @@ import img6 from "../assets/images/Login/pic-6.jpg";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router-dom";
 import { ToastContainer, toast, Flip } from "react-toastify";
-// import {login} from "../services/operations/authApi";
 const arr = [img1, img2, img3, img4, img5, img6];
 const randomImg = arr[Math.floor(Math.random() * arr.length)];
-
-// const handleOnSubmit = (e) => {
-//   e.preventDefault();
-//   console.log("Submitted", user);
-//   try{
-//     apiConnector("POST",login.CATEGORIES_API,user)
-//   }catch(err){
-//     console.log(err)
-//   }
-//   dispatch(login(email,password,navigate))
-// }
 
 const Login = () => {
   const [user, setUser] = useState({ email: "", password: "" });
@@ -115,6 +104,11 @@ const Login = () => {
                 type="password"
                 {...register("password")}
               />
+              <div className="flex text-sm underline-offset-1 underline justify-end w-[100%]">
+                <Link to="/ForgotPassword">
+                <p>Forgot password</p>
+                </Link>
+              </div>
               <input
                 className="text-center transition-all duration-200 hover:scale-95 px-6 py-2 shadow-xl rounded-md onhover:scale-95 font-bold m-3 bg-[#E5A105]"
                 disabled={isSubmitting}

@@ -37,10 +37,22 @@ const userSchema = new Schema({
     token:{
         type:String,
     },
+    resetPasswordExpires:{
+        type:Date,
+    },
     otp:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'otp',
-    }
+    },
+    mobileNumber:{
+        type:Number,
+        default:"",
+        maxlength:10
+    },
+    totalLeaves:{
+        type:Number,
+        default:12
+    },
 });
 
 module.exports=mongoose.model("userModel", userSchema)

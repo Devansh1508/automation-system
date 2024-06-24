@@ -54,7 +54,7 @@ exports.signUp = async (req, res) => {
     try {
         // fetch data from req.body 
         const { email, password, confirmPassword, firstName, lastName,otp, accountType } = req.body;
-
+        console.log("req.body", req.body);
         // validate krlo 
         if (!firstName || !lastName || !email || !password|| !confirmPassword || !accountType || !otp) {
             return res.status(400).json({ success: false, message: "All fields are required" });
@@ -155,10 +155,13 @@ exports.login = async (req, res) => {
           expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
           httpOnly: true,
         };
+
+        user.password=undefined;
+
         res.cookie("token", token, options).status(200).json({
           success: true,
           token,
-          // user,
+          user,
           message: "login successful",
         });
       } else {
@@ -176,3 +179,20 @@ exports.login = async (req, res) => {
       });
     }
   };
+
+  exports.deleteUser = async (req, res) => {
+    try{
+      const id=req.user.id;
+      await userModel.findByIdAndDelete(id);
+      res.status(200).json({
+        success: true,
+        message: "User deleted successfully"
+      })
+    }catch(err){
+      console.log("error: ", err);
+      res.status(500).json({
+        success: false,
+        message: "error occured while deleting user"
+      })
+    }
+  }
