@@ -7,3 +7,10 @@
   padding: 1px;
   border-radius: 0.75rem;
 }
+
+.card{
+  width: fit-content;
+  block-size: fit-content;
+  min-width: 18vw;
+}
+

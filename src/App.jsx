@@ -8,6 +8,7 @@ import OtpGenerate from "./pages/OtpGenerate";
 import OpenRoute from "./components/common/OpenRoute";
 import { Routes, Route } from "react-router-dom";
 import ChangePassword from "./pages/ChangePassword";
+import LeaveForm from "./pages/LeaveForm";
 
 function App() {
   return (
@@ -16,9 +17,15 @@ function App() {
         <Route
           path="/Signup"
           element={
-            <OpenRoute>
               <Signup />
-            </OpenRoute>
+          }
+        />
+        <Route
+          path="/LeaveForm"
+          element={
+            // <OpenRoute>
+              <LeaveForm/>
+            // </OpenRoute>
           }
         />
         <Route

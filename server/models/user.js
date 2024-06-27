@@ -47,7 +47,7 @@ const userSchema = new Schema({
     mobileNumber:{
         type:Number,
         default:"",
-        maxlength:10
+        length:10,
     },
     totalLeaves:{
         type:Number,

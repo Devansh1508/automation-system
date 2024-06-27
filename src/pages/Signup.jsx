@@ -9,30 +9,14 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast, Flip } from "react-toastify";
-import { generate } from "otp-generator";
+import { useNavigate } from "react-router-dom";
 
 const arr = [img1, img2, img3, img4, img5, img6];
 const randomImg = arr[Math.floor(Math.random() * arr.length)];
 
 const Signup = () => {
-  // const [color, setColor] = useState("bg-[#E9A246]");
-  // const [Otpcolor, setotpColor] = useState("bg-[#E9A246]");
-
-  // const buttonClick = () => {
-  //   setColor("bg-[#F6F3EF]");
-  //   setTimeout(() => {
-  //     // if(color==="bg-[#E9A246]")
-  //       setColor("bg-[#E9A246]")
-  // },100);
-  // };
-  // const buttonClick = () => {
-  //   setColor("bg-[#F6F3EF]");
-  //   setTimeout(() => {
-  //     // if(color==="bg-[#E9A246]")
-  //       setColor("bg-[#E9A246]")
-  // },100);
-  // };
-
+  const navigate=useNavigate();
+  const [userCreated,setUserCreated]=useState(false);
   const [user, setUser] = useState({
     email: "",
     otp: "",
@@ -42,6 +26,16 @@ const Signup = () => {
     confirmPassword: "",
     accountType: "",
   });
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if(userCreated){
+        navigate("/login");
+      }
+    }, 2000); 
+  
+    return () => clearTimeout(timeoutId);
+  }, [userCreated])
 
   const registerUser = async (data, e) => {
     try {
@@ -55,20 +49,16 @@ const Signup = () => {
       });
 
       // notification
-      if (response.ok) notify("🎉 Signup successfull!");
+      if (response.ok){ notify("🎉 Signup successfull!"); setUserCreated(true);}
       else {
         const responseBody = await response.json();
         errorMessage(responseBody.message);
       }
-      // console.log("res:", respons);
     } catch (err) {
       console.log("register/signup", err);
     }
   };
 
-  // useEffect(() => {
-  //   console.log("from use ref", user);
-  // }, [user]);
 
   const onSubmit = async (data, e) => { 
     await setUser({ ...data });

@@ -106,9 +106,7 @@ exports.signUp = async (req, res) => {
             image:`https://api.dicebear.com/5.x/initials/svg?seed=${firstName}${lastName}`
         }
         const userEntry = await userModel.create(userPayload);
-        console.log("userEntry", userEntry);
-        // mailSender(email,"Welcome to Study Notion","<h1>Welcome to Study Notion</h1>");
-        // return response 
+        console.log("userEntry", userEntry)
         res.status(200).json({ success: true, message: "User created successfully" });
 
     } catch (err) {

@@ -1,5 +1,6 @@
 const { uploadImageToCloudinary } = require('../utils/imageUpload');
 const userModel = require('../models/user');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 exports.updateProfilePicture = async (req, res) => {
@@ -23,11 +24,21 @@ exports.updateProfilePicture = async (req, res) => {
 }
 
 exports.updateProfile = async (req, res) => {
-    try {
-        const id = req.user.id;
+    try {    
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const id = decoded.id;
+        
         const {firstName, lastName, mobileNumber, accountType} = req.body;
-
+        console.log("req.body", req.body);
+        if(mobileNumber.length !== 10){
+            return res.status(400).json({
+                success: false,
+                message: "enter a valid mobile number"
+            })
+        }
         if(!firstName || !lastName || !mobileNumber || !accountType){
+            console.log("updatedUser");
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
@@ -51,8 +62,16 @@ exports.updateProfile = async (req, res) => {
 
 exports.getUserDetails=async(req,res)=>{
     try{
-        console.log("req.user:",req);
-        const id=req.user.id;
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const id = decoded.id;
+        if(!id){
+            return res.status(400).json({
+                success:false,
+                message:"id not found"
+            })
+        }
+
         const user=await userModel.findById(id);
 
         return res.status(200).json({
@@ -63,7 +82,8 @@ exports.getUserDetails=async(req,res)=>{
     }catch(err){
         return res.status(500).json({
             success: false,
-            message: "error occurred while fetching profile"
+            message: "error occurred while fetching profile",
+            error:err.message
         })
     }
 }

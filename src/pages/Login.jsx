@@ -6,19 +6,34 @@ import img4 from "../assets/images/Login/pic-4.jpg";
 import img5 from "../assets/images/Login/pic-5.jpg";
 import img6 from "../assets/images/Login/pic-6.jpg";
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
-import "react-toastify/dist/ReactToastify.css";
-import { Link } from "react-router-dom";
-import { ToastContainer, toast, Flip } from "react-toastify";
+import { useState,useEffect} from "react";
+import { ToastContainer} from "react-toastify";
+import { errorMessage,notify } from "../utils/Popup";
+import { useNavigate,Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../redux/slices/profileSlice";
+import { setToken } from "../redux/slices/authSlice";
 const arr = [img1, img2, img3, img4, img5, img6];
 const randomImg = arr[Math.floor(Math.random() * arr.length)];
 
 const Login = () => {
-  const [user, setUser] = useState({ email: "", password: "" });
+  const [input, setInput] = useState({ email: "", password: "" });
+  const [nav,setNav]=useState(false)
+  const {user}=useSelector((state)=>state.profile)
+  const {token}=useSelector((state)=>state.auth)
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    // handleSubmit();
-  }, [user]);
+    const timeoutId = setTimeout(() => {
+      if(nav){
+        navigate("/profile");
+      }
+    }, 2000); 
+  
+    return () => clearTimeout(timeoutId);
+  }, [nav,user])
 
   const {
     register,
@@ -28,8 +43,7 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    // console.log("data", data);
-    await setUser({ ...data });
+    await setInput({ ...data });
     const response = await fetch("http://localhost:4000/api/v1/auth/login", {
       method: "POST",
       headers: {
@@ -39,40 +53,18 @@ const Login = () => {
     });
 
     const responseBody = await response.json();
-    if (response.ok) notify();
+    if (response.ok){ notify("🎉 Login successfull!"); setNav(true);
+      dispatch(setToken(responseBody.token))
+      dispatch(setUser(responseBody.user))
+      await localStorage.setItem("token", JSON.stringify(responseBody.token))
+      await localStorage.setItem("user", JSON.stringify(responseBody.user))
+    }
     else {
       errorMessage(responseBody.message);
     }
     console.log("res:", responseBody.message);
   };
 
-  const notify = () =>
-    toast.success("🎉 Login successfull!", {
-      position: "top-right",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      transition: Flip,
-    });
-
-  const errorMessage = (message) =>
-    toast.error(`${message}`, {
-      position: "top-center",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Flip,
-    });
-
-  // input styling
   const styling =
     "m-1 border-2 flex justify-center items-center p-[1px] rounded-xl";
 
@@ -109,12 +101,16 @@ const Login = () => {
                 <p>Forgot password</p>
                 </Link>
               </div>
-              <input
+              {
+                !nav&&(
+                  <input
                 className="text-center transition-all duration-200 hover:scale-95 px-6 py-2 shadow-xl rounded-md onhover:scale-95 font-bold m-3 bg-[#E5A105]"
                 disabled={isSubmitting}
                 type="Submit"
                 name="Submit"
               />
+                )
+              }
             </form>
             <ToastContainer />
           </div>

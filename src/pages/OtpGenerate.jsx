@@ -1,12 +1,15 @@
 import React from "react";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { set, useForm } from "react-hook-form";
 import "./css/otp.css";
 import otp from "../assets/images/otp.svg";
 import { ToastContainer, toast, Flip } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const OtpGenerate = () => {
   const [user,setUser] = useState({email:""});
+  const [otpGenerated,setOtpGenerated] = useState(false);
+  const navigate = useNavigate();
 
   const generateOtp = async (data,e) => {
     try {
@@ -21,7 +24,7 @@ const OtpGenerate = () => {
 
 
       if (response.ok) {
-        notify("Otp is successfully send");
+        notify("Otp is successfully send"); setOtpGenerated(true);
       } else {
         const responseBody =await response.json();
         console.log("responseBody", responseBody);
@@ -32,6 +35,16 @@ const OtpGenerate = () => {
       errorMessage("error while generating otp");
     }
   };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if(otpGenerated){
+        navigate("/signup");
+      }
+    }, 2000); 
+  
+    return () => clearTimeout(timeoutId);
+  }, [otpGenerated])
 
   const {
     register,
