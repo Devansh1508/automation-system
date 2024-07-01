@@ -42,13 +42,13 @@ const Navbar = () => {
               Leave Form
             </div>
           </Link>
-
+          <Link to="/AppliedLeaves">
           < div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300 mr-4">
-            Services
+            Applied Leaves
           </div>
-          < div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300">
-            Contact
-          </div>
+          </Link>
+          
+          
         </div>
       </div>
     </nav>

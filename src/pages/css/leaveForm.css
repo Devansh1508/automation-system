@@ -1,0 +1,13 @@
+.leaveForm{
+    background-image: url('../../assets/images/form/bg.jpg');
+    background-size: cover;
+}
+
+.formBg{
+    background-image: url('../../assets/images/form/bg.jpg');
+      background-size: cover;
+  }
+
+.bgForm{
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(229,229,234,1) 35%, rgba(206,210,211,1) 100%);
+}

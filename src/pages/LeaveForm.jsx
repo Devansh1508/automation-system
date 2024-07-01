@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import Navbar from '../components/common/Navbar';
+import { errorMessage,notify } from '../utils/Popup';
+import { useSelector } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import './css/leaveForm.css'
 
 const LeaveForm = () => {
+  const {token}=useSelector((state)=>state.auth)
+  const [flag,setFlag]=useState(false)
+  const location=useNavigate()
+
   const [formData, setFormData] = useState({
     nature: '',
     period: '',
@@ -24,16 +33,43 @@ const LeaveForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit =async (e) => {
     e.preventDefault();
-    console.log('Form Data Submitted:', formData);
+    try{
+      const response = await fetch(
+        "http://localhost:4000/api/v1/leaves/createLeave",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+      console.log(response)
+      const responseBody = await response.json();
+      if(responseBody.success){
+        setFlag(true)
+        notify(responseBody.message);
+        setTimeout(() => {
+          location("/profile");
+        }, 2000);
+      
+      
+      }
+      else errorMessage(responseBody.message);
+    }catch(err){
+      console.log(err)
+      errorMessage("Failed to create leave")
+    }
   };
 
   return (
-    <div className="flex flex-col w-[100vw] gap-5 items-center justify-center min-h-screen bg-gray-100">
+    <div className="leaveForm flex flex-col w-[100vw] gap-5 items-center justify-center min-h-screen bg-gray-100">
       <Navbar/>
-      <div className='w-[100vw] flex justify-end'>
-      <div className="bg-white p-8 rounded shadow-md w-[80vw] border-md">
+      <div className='w-[100vw] flex justify-center'>
+      <div className="bg-white  mb-10 p-8 rounded shadow-md w-[80vw] border-md">
         <h2 className="text-2xl font-bold mb-6">Leave/Vacation Form</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -155,13 +191,18 @@ const LeaveForm = () => {
             />
           </div>
 
-          <button
+          {
+            !flag&&(
+              <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
           >
             Submit
           </button>
+            )
+          }
         </form>
+        <ToastContainer />
       </div>
       </div>
     </div>

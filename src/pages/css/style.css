@@ -14,3 +14,33 @@
   min-width: 18vw;
 }
 
+.statusApproved{
+  animation: approved 3s infinite;
+}
+.statusRejected{
+  animation: notApproved 3s infinite;
+}
+
+@keyframes approved{
+  0% {
+      background-color: #ffffff; /* Initial color */
+    }
+    50% {
+      background-color: #ff0000; /* Color to change to */
+    }
+    100% {
+      background-color: #ffffff; /* Back to initial color */
+    }
+}
+
+@keyframes notApproved{
+  0% {
+      background-color: #ffffff; /* Initial color */
+    }
+    50% {
+      background-color: #00ff00; /* Color to change to */
+    }
+    100% {
+      background-color: #ffffff; /* Back to initial color */
+    }
+}

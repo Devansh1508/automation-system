@@ -257,6 +257,7 @@ const Profile = () => {
         </div>
       </div>
       <div></div>
+      <ToastContainer />
     </div>
   );
 };

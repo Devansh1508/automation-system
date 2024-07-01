@@ -3,6 +3,7 @@ const db = require('./config/database');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');  
+const leaveRoutes = require('./routes/leaves');
 const {cloudinaryConnect}=require('./config/cloudinary');
 require('dotenv').config();
 
@@ -36,3 +37,4 @@ app.get('/', (req, res) => {
 // routes 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/profile', profileRoutes);
+app.use('/api/v1/leaves', leaveRoutes);

@@ -9,6 +9,8 @@ import OpenRoute from "./components/common/OpenRoute";
 import { Routes, Route } from "react-router-dom";
 import ChangePassword from "./pages/ChangePassword";
 import LeaveForm from "./pages/LeaveForm";
+import AppliedLeaves from "./pages/AppliedLeaves";
+import EditLeave from "./pages/EditLeave";
 
 function App() {
   return (
@@ -36,6 +38,7 @@ function App() {
             </OpenRoute>
           }
         />
+        <Route path="/AppliedLeaves" element={<AppliedLeaves />} />
         <Route path="/Otp" element={<OtpGenerate />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/" element={<Home />} />
@@ -43,6 +46,12 @@ function App() {
           path="ForgotPassword"
           element={
               <ForgotPassword />
+          }
+        />
+        <Route
+          path="AppliedLeaves/:id"
+          element={
+              <EditLeave/>
           }
         />
         <Route

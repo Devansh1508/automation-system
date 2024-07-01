@@ -1,0 +1,53 @@
+import React, { useEffect,useState } from "react";
+import Navbar from "../components/common/Navbar";
+import { errorMessage } from "../utils/Popup";
+import { useSelector } from "react-redux";
+import Card from "../components/Leave/Card";
+
+const Waiting = () => {
+  const { token } = useSelector((state) => state.auth);
+  const [leaves, setLeaves] = useState([]);
+
+  useEffect(() => {
+    getLeaves();
+  }, []);
+
+  const getLeaves = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:4000/api/v1/leaves/getMyleave",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        console.log("data:", data.data);
+        setLeaves(data.data);
+      } else {
+        errorMessage(data.message);
+      }
+    } catch (err) {
+      console.log("err:", err);
+      errorMessage("error while fetching profile");
+    }
+  };
+
+  return (
+    <div>
+      <Navbar />
+      <div className="flex flex-wrap">
+      {leaves.map((leave) => (
+        <Card key={leave._id} leave={leave} />
+      ))}
+      </div>
+    </div>
+  );
+};
+
+export default Waiting;

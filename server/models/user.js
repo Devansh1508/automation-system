@@ -53,6 +53,10 @@ const userSchema = new Schema({
         type:Number,
         default:12
     },
+    leaves:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'leave'
+    }]
 });
 
 module.exports=mongoose.model("userModel", userSchema)
