@@ -1,11 +1,13 @@
 const express = require('express');
 const router=express.Router();
 
-const {getAllLeaves,getMyLeave,createLeave,deleteLeave,getLeave}=require('../controllers/leave');
+const {approveLeave,getAllLeaves,getMyLeave,createLeave,deleteLeave,getLeave,getApprovedLeaves}=require('../controllers/leave');
 
-router.get('/getAllLeaves',getAllLeaves);
+router.put('/approveLeave/user/:userId/leave/:leaveId',approveLeave);
+router.get('/getApprovedLeaves',getApprovedLeaves);
+router.get('/getAllLeaves/:id',getAllLeaves);
 router.get('/getMyLeave',getMyLeave);
-router.post('/createLeave',createLeave);
+router.post('/createLeave',createLeave);    
 router.delete('/deleteLeave/:id',deleteLeave);
 router.get('/getLeave/:id',getLeave);
 

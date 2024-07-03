@@ -3,8 +3,10 @@ import Navbar from "../components/common/Navbar";
 import { errorMessage } from "../utils/Popup";
 import { useSelector } from "react-redux";
 import Card from "../components/Leave/Card";
+import { useLocation } from "react-router-dom";
 
 const Waiting = () => {
+  const location=useLocation();
   const { token } = useSelector((state) => state.auth);
   const [leaves, setLeaves] = useState([]);
 

@@ -25,15 +25,15 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   const timeoutId = setTimeout(() => {
-  //     if(nav){
-  //       navigate("/profile");
-  //     }
-  //   }, 2000); 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if(nav){
+        navigate("/profile");
+      }
+    }, 2000); 
   
-  //   return () => clearTimeout(timeoutId);
-  // }, [nav,user])
+    return () => clearTimeout(timeoutId);
+  }, [nav,user])
 
   const {
     register,
@@ -59,6 +59,7 @@ const Login = () => {
       dispatch(setUser(responseBody.user))
       await localStorage.setItem("token", JSON.stringify(responseBody.token))
       await localStorage.setItem("user", JSON.stringify(responseBody.user))
+      setNav(true)
     }
     else {
       errorMessage(responseBody.message);

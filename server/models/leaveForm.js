@@ -54,6 +54,14 @@ const leaveFormSchema = new Schema({
   approved:{
     type: Boolean,
     default: false
+  },
+  approvedAt:{
+    type: Date,
+    default: null
+  },
+  approvedBy:{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
   }
 }, {
   timestamps: true

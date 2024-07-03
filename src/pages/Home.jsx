@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Home = () => {
   const navigate = useNavigate(); 
   return (
-    <div className="w-[100vw] h-[100vh] flex justify-center overflow-hidden ">
+      <div className="w-[100vw] h-[100vh] flex justify-center overflow-hidden ">
       <div className="w-11/12 h-11/12 flex flex-row">
         <div className="mt-[30vh] ml-[10vw] w-[40%] h-[100%]">
           <p className="text-4xl">

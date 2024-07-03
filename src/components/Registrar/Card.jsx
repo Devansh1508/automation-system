@@ -1,20 +1,17 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";  
 
-const formatDate = (date) => new Date(date).toLocaleDateString();
-
-const onEdit = () => {
-  console.log("Edit button clicked");
-};
-
-const onDelete = () => {
-  console.log("Delete button clicked");
-};
-
 const Card = (leave) => {
+  const formatDate = (date) => new Date(date).toLocaleDateString();
+
+  const { user } = useSelector((state) => state.profile);
+
   return (
     <div>
-      <Link to={`/EditLeave/${leave.leave._id}`}>
+      <Link 
+        to={user.accountType === "HOD" ? `/AllLeaves/user/${user._id}/leave/${leave.leave._id}` : `/AppliedLeaves/${leave.leave._id}`}
+      >
         <div className="rounded m-4 block w-[30vw] shadow-lg p-4 bg-[#f1f0f0] transform transition duration-500 hover:scale-105 hover:shadow-2xl">
           <div className="font-bold text-xl mb-2">{leave.leave.nature}</div>
           <p className="text-gray-700 text-base">
@@ -40,20 +37,11 @@ const Card = (leave) => {
             <strong>Status:</strong>{" "}
             {leave.leave.approved ? "Approved" : "Not Approved"}
           </p>
-          <div className="mt-4 flex justify-between">
-            <button
-              onClick={onEdit}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-            >
-              Edit
-            </button>
-            <button
-              onClick={onDelete}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-            >
-              Delete
-            </button>
-          </div>
+          {leave.leave.approved && (
+            <div className="text-gray-700 text-base">
+              <strong>Approved By:</strong> {leave.leave.name} ({leave.leave.email})
+            </div>
+          )}
         </div>
       </Link>
     </div>

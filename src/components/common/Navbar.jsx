@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const {user}=useSelector((state)=>state.profile)
 
   return (
     <nav className="bg-blue-500 p-4 w-[100vw]">
@@ -47,7 +50,24 @@ const Navbar = () => {
             Applied Leaves
           </div>
           </Link>
-          
+          {
+            user.accountType==="HOD"&&(
+              <Link to={`/AllLeaves/${user._id}`}>
+              < div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300 mr-4">
+                All Leaves
+              </div>
+              </Link>
+            )
+          }
+          {
+            user.accountType==="Registrar"&&(
+              <Link to="/LeaveRequests">
+              < div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300 mr-4">
+                Approved Leaves
+              </div>
+              </Link>
+            )
+          }
           
         </div>
       </div>

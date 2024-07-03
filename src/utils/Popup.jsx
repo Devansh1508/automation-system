@@ -11,7 +11,7 @@ export const errorMessage = (message) =>
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      theme: "colored",
+      theme: "dark",
       transition: Flip,
     });
 
@@ -28,4 +28,3 @@ export const notify = (message) =>
           transition: Flip,
         });
 
-// export default errorMessage;

@@ -30,7 +30,6 @@ const Profile = () => {
   },[]);
   
   useEffect(() => {
-    console.log("loaded");
     if(loading){
       getProfile();
       setLoading(false);
@@ -64,7 +63,6 @@ const Profile = () => {
       );
       const data = await response.json();
       if (data.success) {
-        console.log("data:", data);
         dispatch(setUser(data.data));
         setFirstName(data.data.firstName);
         setLastName(data.data.lastName);
@@ -113,7 +111,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="w-[100vw] h-[100vh]">
+    <div className="w-[100vw] h-[100vh] overflow-hidden">
       <Navbar />
       {
         // update profile page
@@ -213,7 +211,7 @@ const Profile = () => {
           </div>
         )
       }
-      <div className="w-[100vw] h-[70vh] flex flex-col">
+      <div className="w-[100vw] h-[100vh] flex flex-col">
         <div className="w-[100vw] p-10 h-[10vh] flex justify-end bg-[rgb(0,10,48)]">
           <div onClick={logoutClick}>
             <Button color={"#AA0101"} text={"Logout"} />

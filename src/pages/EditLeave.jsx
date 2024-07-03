@@ -12,6 +12,7 @@ const LeaveCard = () => {
   const navigate=useNavigate()
   const { id } = useParams();
   const { token } = useSelector((state) => state.auth);
+  const {user}=useSelector((state)=>state.profile)
   const [leave, setLeave] = useState({
     nature: "",
     period: "",
@@ -97,7 +98,7 @@ const LeaveCard = () => {
       const data = await response.json();
       if (data.success) {
         notify("deleted")
-        navigate("/profile")  
+        navigate("/AppliedLeaves")  
       } else {
         errorMessage(data.message);
       }
@@ -247,7 +248,9 @@ const LeaveCard = () => {
               </label>
               <p className="text-gray-700">{formatDate(leave.createdAt)}</p>
             </div>
-            <div className="flex justify-between">
+            {
+              !leave.approved&&(
+                  <div className="flex justify-between">
               <div>
                 <button
                   onClick={handleEdit}
@@ -264,6 +267,8 @@ const LeaveCard = () => {
                 </button>
               </div>
             </div>
+              )
+            }
           </div>
         )}
       </div>

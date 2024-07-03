@@ -11,22 +11,21 @@ import ChangePassword from "./pages/ChangePassword";
 import LeaveForm from "./pages/LeaveForm";
 import AppliedLeaves from "./pages/AppliedLeaves";
 import EditLeave from "./pages/EditLeave";
+import AllLeaves from "./pages/AllLeaves";
+import { useSelector } from "react-redux";
+import ApproveLeave from "./pages/ApproveLeave";
 
 function App() {
+  const {user} = useSelector((state) => state.profile);
   return (
     <div>
       <Routes>
-        <Route
-          path="/Signup"
-          element={
-              <Signup />
-          }
-        />
+        <Route path="/Signup" element={<Signup />} />
         <Route
           path="/LeaveForm"
           element={
             // <OpenRoute>
-              <LeaveForm/>
+            <LeaveForm />
             // </OpenRoute>
           }
         />
@@ -42,17 +41,21 @@ function App() {
         <Route path="/Otp" element={<OtpGenerate />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/" element={<Home />} />
+        <Route path="ForgotPassword" element={<ForgotPassword />} />
+        <Route path={`AllLeaves/:id`} element={<AllLeaves />} />
         <Route
-          path="ForgotPassword"
-          element={
-              <ForgotPassword />
-          }
+          path={ `/AllLeaves/user/:userId/leave/:leaveId`}
+          element={<ApproveLeave />}
+        />
+       
+
+        <Route
+          path="/AppliedLeaves/:id"
+          element={<AppliedLeaves />}
         />
         <Route
-          path="AppliedLeaves/:id"
-          element={
-              <EditLeave/>
-          }
+          path="/EditLeave/:id"
+          element={<EditLeave />}
         />
         <Route
           path="update-password/:id"
@@ -63,7 +66,6 @@ function App() {
           }
         />
       </Routes>
-
     </div>
   );
 }
