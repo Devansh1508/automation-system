@@ -9,11 +9,12 @@ import OpenRoute from "./components/common/OpenRoute";
 import { Routes, Route } from "react-router-dom";
 import ChangePassword from "./pages/ChangePassword";
 import LeaveForm from "./pages/LeaveForm";
-import AppliedLeaves from "./pages/AppliedLeaves";
+import MyRequest from "./pages/MyRequests";
 import EditLeave from "./pages/EditLeave";
-import AllLeaves from "./pages/AllLeaves";
+import PendingApprovals from "./pages/PendingApprovals";
 import { useSelector } from "react-redux";
 import ApproveLeave from "./pages/ApproveLeave";
+import ApprovedLeaves from "./pages/ApprovedLeaves";
 
 function App() {
   const {user} = useSelector((state) => state.profile);
@@ -32,27 +33,32 @@ function App() {
         <Route
           path="/Login"
           element={
-            <OpenRoute>
+            // <OpenRoute>
               <Login />
-            </OpenRoute>
+            // </OpenRoute>
           }
         />
-        <Route path="/AppliedLeaves" element={<AppliedLeaves />} />
+        <Route path="/myRequests" element={<MyRequest />} />
         <Route path="/Otp" element={<OtpGenerate />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/" element={<Home />} />
         <Route path="ForgotPassword" element={<ForgotPassword />} />
-        <Route path={`AllLeaves/:id`} element={<AllLeaves />} />
+        <Route path={`PendingApprovals/:id`} element={<PendingApprovals />} />
         <Route
           path={ `/AllLeaves/user/:userId/leave/:leaveId`}
           element={<ApproveLeave />}
         />
        
-
         <Route
+          path={ `/ApprovedLeaves`}
+          element={<ApprovedLeaves />}
+        />
+       
+        {/* <Route
           path="/AppliedLeaves/:id"
           element={<AppliedLeaves />}
-        />
+        /> */}
+        
         <Route
           path="/EditLeave/:id"
           element={<EditLeave />}

@@ -5,24 +5,7 @@ import Card from "../components/HOD/Card";
 
 const AllLeaves = () => {
   const { user } = useSelector((state) => state.profile);
-  const [leaveData, setLeaveData] = useState(
-    [
-      {
-        nature: "",
-        period: "",
-        fromDate: "",
-        toDate: "",
-        prefixSuffix: false,
-        grounds: "",
-        address: "",
-        responsibilities: "",
-        extraWorkDate: [],
-        clCoAvailed: "",
-        remark: "",
-      },
-    ],
-    []
-  );
+  const [leaveData, setLeaveData] = useState([]);
 
   const id = user._id;
 
@@ -55,9 +38,11 @@ const AllLeaves = () => {
     <div>
       <Navbar />
       <div className="flex flex-wrap">
-        {leaveData.map((leave) => (
+        {leaveData&&(
+          leaveData.map((leave) => (
           <Card key={leave._id} leave={leave} />
-        ))}
+        )))
+        }
       </div>
     </div>
   );

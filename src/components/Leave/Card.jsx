@@ -40,20 +40,6 @@ const Card = (leave) => {
             <strong>Status:</strong>{" "}
             {leave.leave.approved ? "Approved" : "Not Approved"}
           </p>
-          <div className="mt-4 flex justify-between">
-            <button
-              onClick={onEdit}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-            >
-              Edit
-            </button>
-            <button
-              onClick={onDelete}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-            >
-              Delete
-            </button>
-          </div>
         </div>
       </Link>
     </div>

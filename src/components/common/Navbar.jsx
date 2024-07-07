@@ -45,23 +45,23 @@ const Navbar = () => {
               Leave Form
             </div>
           </Link>
-          <Link to="/AppliedLeaves">
+          <Link to="/myRequests">
           < div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300 mr-4">
-            Applied Leaves
+            My Requests
           </div>
           </Link>
           {
             user.accountType==="HOD"&&(
-              <Link to={`/AllLeaves/${user._id}`}>
+              <Link to={`/PendingApprovals/${user._id}`}>
               < div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300 mr-4">
-                All Leaves
+                Pending Approvals
               </div>
               </Link>
             )
           }
           {
             user.accountType==="Registrar"&&(
-              <Link to="/LeaveRequests">
+              <Link to="/ApprovedLeaves">
               < div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300 mr-4">
                 Approved Leaves
               </div>

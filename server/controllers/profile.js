@@ -46,7 +46,7 @@ exports.updateProfile = async (req, res) => {
         }
 
         const updatedUser = await userModel.findByIdAndUpdate(id, { firstName, lastName, mobileNumber, accountType }, { new: true });
-
+        console.log("updatedUser", updatedUser);
         return res.status(200).json({
             success: true,
             message: "Profile updated successfully",
@@ -73,6 +73,32 @@ exports.getUserDetails=async(req,res)=>{
         }
 
         const user=await userModel.findById(id);
+
+        return res.status(200).json({
+            success:true,
+            message:"Profile fetched successfully",
+            data:user
+        })
+    }catch(err){
+        return res.status(500).json({
+            success: false,
+            message: "error occurred while fetching profile",
+            error:err.message
+        })
+    }
+}
+
+exports.getApplicantDetails=async(req,res)=>{ 
+    try{
+        const userId = req.params.id;
+        if(!userId){
+            return res.status(400).json({
+                success:false,
+                message:"id not found"
+            })
+        }
+
+        const user=await userModel.findById(userId);
 
         return res.status(200).json({
             success:true,

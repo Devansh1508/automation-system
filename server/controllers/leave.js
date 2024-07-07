@@ -6,10 +6,10 @@ require('dotenv').config();
 
 exports.createLeave = async (req, res) => {
     try{
-        // const token=req.headers.authorization.split(" ")[1];
-        // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // const user = decoded.id;
-        const user = req.body.id;
+        const token=req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = decoded.id;
+        // const user = req.body.id;
 
         console.log(req);
         const validUser= await userModel.findById(user);
@@ -93,13 +93,13 @@ exports.getLeave=async (req,res)=>{
         }
 
         const leaveId = req.params.id;
-        console.log(leaveId);
         const leave = await leaveModel.findById(leaveId);
-        console.log(leave);
+
+        const userRequestedForLeave = await userModel.findById(leave.user);
         return res.status(200).json({
             success: true,
             message: "Leave fetched successfully",
-            data: leave
+            data: {leave, userRequestedForLeave}
         })
     }catch(err){
         return res.status(500).json({
@@ -131,7 +131,6 @@ exports.getMyLeave = async (req, res) => {
             leaves.push(leave);
         }}
 
-        console.log("leaves");
         return res.status(200).json({
             success: true,
             message: "Leave fetched successfully",
@@ -148,11 +147,11 @@ exports.getMyLeave = async (req, res) => {
 
 exports.getApprovedLeaves = async (req, res) => {
     try{
-        // const token=req.headers.authorization.split(" ")[1];
-        // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // const user = decoded.id;
+        const token=req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = decoded.id;
 
-        const user = req.body.id;
+        // const user = req.body.id;
         
         const validUser= await userModel.findById(user);
         if(!validUser){
@@ -243,6 +242,16 @@ exports.approveLeave = async (req, res) => {
             });
         }
 
+        const applicant = req.body.applicant;
+        if(!applicant){
+            return res.status(400).json({
+                success: false,
+                message: "leave cannot be approved"
+            });
+        }
+
+        const durationOfLeave=((leave.toDate-leave.fromDate)/(1000 * 60 * 60 * 24))+1;
+        const leavePeriod = validUser.totalLeaves-durationOfLeave;
         if (leave.approved) {
             const currentTime = new Date();
             const approvalTime = new Date(leave.approvedAt);
@@ -250,6 +259,7 @@ exports.approveLeave = async (req, res) => {
 
             if (timeDifference < 5) {
                 await leaveModel.findByIdAndUpdate(leaveId, { approved: false, approvedAt: null, approvedBy: null});
+                await userModel.findByIdAndUpdate(applicant, {totalLeaves: validUser.totalLeaves+durationOfLeave});
             }else{
                 return res.status(400).json({
                     success: false,
@@ -259,6 +269,7 @@ exports.approveLeave = async (req, res) => {
 
         } else {
             await leaveModel.findByIdAndUpdate(leaveId, { approved: true, approvedAt: new Date(), approvedBy:user});
+            await userModel.findByIdAndUpdate(applicant, {totalLeaves: leavePeriod});
         }
 
         return res.status(200).json({

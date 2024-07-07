@@ -10,7 +10,7 @@ const Card = (leave) => {
   return (
     <div>
       <Link 
-        to={user.accountType === "HOD" ? `/AllLeaves/user/${user._id}/leave/${leave.leave._id}` : `/AppliedLeaves/${leave.leave._id}`}
+        to={`/EditLeave/${leave.leave._id}`}
       >
         <div className="rounded m-4 block w-[30vw] shadow-lg p-4 bg-[#f1f0f0] transform transition duration-500 hover:scale-105 hover:shadow-2xl">
           <div className="font-bold text-xl mb-2">{leave.leave.nature}</div>

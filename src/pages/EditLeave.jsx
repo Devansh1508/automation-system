@@ -73,7 +73,7 @@ const LeaveCard = () => {
 
       if (data.success) {
         console.log("data:", data.data);
-        setLeave(data.data);
+        setLeave(data.data.leave);
       } else {
         errorMessage(data.message);
       }
@@ -98,7 +98,7 @@ const LeaveCard = () => {
       const data = await response.json();
       if (data.success) {
         notify("deleted")
-        navigate("/AppliedLeaves")  
+        navigate("/myRequests")  
       } else {
         errorMessage(data.message);
       }

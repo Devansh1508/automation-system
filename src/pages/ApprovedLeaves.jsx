@@ -1,10 +1,12 @@
 import React , {useEffect, useState} from 'react'
-import Card from '../components/Registrar/Card'
+import Card from '../components/approvedLeaves/Card'
 import Navbar from '../components/common/Navbar'
-
+import { errorMessage } from '../utils/Popup'
+import { useSelector } from 'react-redux'
 
 const Registrar = () => {
     const [leave, setLeave] = useState([]);
+    const { token } = useSelector((state) => state.auth);
 
     useEffect(() => {
         getApprovedLeaves();
@@ -19,7 +21,7 @@ const Registrar = () => {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                authorization: `Bearer ${token}`,
+                "authorization": `Bearer ${token}`,
               },
             }
           );

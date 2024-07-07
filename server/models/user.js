@@ -30,6 +30,14 @@ const userSchema = new Schema({
         type:String,
         required:true
     },
+    unpaidLeaves:{ 
+        type:Number,
+        default:0
+    },
+    monthlyUnpaidLeaves:{
+        type:Number,
+        default:0
+    },
     post:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'post'

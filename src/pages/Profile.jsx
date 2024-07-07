@@ -27,6 +27,7 @@ const Profile = () => {
   
   useEffect(() => {
     getProfile();
+    console.log("user",user)
   },[]);
   
   useEffect(() => {
@@ -236,14 +237,14 @@ const Profile = () => {
                 </p>
                 <div className="duration-300 hover:scale-110 transition-all flex-col gap-1 p-8 w-[7vw] mx-4 rounded-md flex items-center justify-center text-white bg-[#212c54e7]">
                   <p className=" text-[#e9e3e3d7]">post</p>
-                  <p name="accountType">HOD</p>
+                  <p name="accountType">{user?.accountType}</p>
                 </div>
               </div>
               <div className="gap-4 flex flex-wrap my-8  h-[70%] w-[100%]">
                 <Card title="Email" data={user?.email} />
-                <Card title="mobileNumber" data={user?.mobileNumber} />
-                <Card title="totalLeaves" data={user?.totalLeaves} />
-                <Card title="totalPost" data={12 - user?.totalLeaves} />
+                <Card title="Mobile Number" data={user?.mobileNumber} />
+                <Card title="Remaining paid leaves" data={user?.totalLeaves} />
+                <Card title="Unpaid Leaves" data={user?.unpaidLeaves} />
               </div>
               <div className="flex">
                 <div onClick={editClick}>

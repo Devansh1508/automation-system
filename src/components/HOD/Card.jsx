@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 import { Link } from "react-router-dom";  
 import { useSelector } from "react-redux";
 
@@ -6,6 +6,35 @@ const formatDate = (date) => new Date(date).toLocaleDateString();
 
 const Card = (leave) => {
     const { user } = useSelector((state) => state.profile);
+    const [applicant, setApplicant] = useState({});
+
+    useEffect(() => {
+        getUser();
+    },[]);
+
+    const getUser = async () => {
+      try {
+        if(leave.leave.user){
+        const response = await fetch(
+          `http://localhost:4000/api/v1/profile/getApplicantDetails/${leave.leave.user}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.success) {
+          console.log(data);
+          setApplicant(data.data);
+        }
+      }
+      } catch (err) {
+        console.log("err:", err);
+      }
+    };
+
   return (
     <div>
       <Link to={`/AllLeaves/user/${user._id}/leave/${leave.leave._id}`}>
@@ -25,6 +54,19 @@ const Card = (leave) => {
           </p>
           <p className="text-gray-700 text-base">
             <strong>Applied On:</strong> {formatDate(leave.leave.createdAt)}
+          </p>
+          <br />
+          <p className="text-gray-700 text-base">
+            <strong>Applied By</strong> 
+          </p>
+          <p className="text-gray-700 text-base">
+            <strong>Name: {applicant.firstName +" " + applicant.lastName}</strong> 
+          </p>
+          <p className="text-gray-700 text-base">
+            <strong>Email: {applicant.email}</strong> 
+          </p>
+          <p className="text-gray-700 text-base">
+            <strong>post: {applicant.accountType}</strong> 
           </p>
           <p
             className={`text-base ${

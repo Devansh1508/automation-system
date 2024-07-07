@@ -4,13 +4,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Status from "../components/Leave/Status";
 import "./css/leaveForm.css";
-import { notify,errorMessage } from "../utils/Popup";
+import { notify, errorMessage } from "../utils/Popup";
 import { ToastContainer } from "react-toastify";
 
 const LeaveCard = () => {
   const { userId, leaveId } = useParams();
   const { token } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.profile);
+  const [applicant, setApplicant] = useState({});
   const formatDate = (date) => new Date(date).toLocaleDateString();
   const [approve, setApprove] = useState(false);
   const [leave, setLeave] = useState({});
@@ -28,14 +29,15 @@ const LeaveCard = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "authorization": `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
       const data = await response.json();
 
       if (data.success) {
-        setLeave(data.data);
+        setLeave(data.data.leave);
+        setApplicant(data.data.userRequestedForLeave);
       } else {
         errorMessage(data.message);
       }
@@ -53,16 +55,22 @@ const LeaveCard = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "authorization": `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({ applicant }),
         }
       );
       const data = await response.json();
-      
+
       if (data.success) {
-        if (approve === false) {notify("Leave approved"); setApprove(true);}
-        else {notify("leave Disapproved"); setApprove(false);}
-      }else{
+        if (approve === false) {
+          notify("Leave approved");
+          setApprove(true);
+        } else {
+          notify("leave Disapproved");
+          setApprove(false);
+        }
+      } else {
         errorMessage(data.message);
       }
     } catch (err) {
@@ -85,12 +93,43 @@ const LeaveCard = () => {
             </div>
             <Status leave={leave} />
           </div>
+          <br />
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold">
+              Applicant Name:
+            </label>
+            <p className="text-gray-700">
+              {applicant.firstName + " " + applicant.lastName}
+            </p>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold">
+              Applicant Email:
+            </label>
+            <p className="text-gray-700">{applicant.email}</p>
+          </div>
+          {applicant.mobileNumber && (
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">
+                Mobile Number:
+              </label>
+              <p className="text-gray-700">{applicant.mobileNumber}</p>
+            </div>
+          )}
+
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold">
+              Applicant Post:
+            </label>
+            <p className="text-gray-700">{applicant.accountType}</p>
+          </div>
           <div className="mb-4">
             <label className="block text-gray-700 font-bold">
               Nature of Leave:
             </label>
             <p className="text-gray-700">{leave.nature}</p>
           </div>
+          <br />
           <div className="mb-4">
             <label className="block text-gray-700 font-bold">
               Period of Leave:
@@ -154,12 +193,12 @@ const LeaveCard = () => {
           </div>
           <div className="flex justify-between">
             <div>
-                <button
-                  onClick={handleApprove}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-                >
-                  Approve
-                </button>   
+              <button
+                onClick={handleApprove}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+              >
+                Approve
+              </button>
             </div>
           </div>
         </div>

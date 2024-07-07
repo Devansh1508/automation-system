@@ -4,6 +4,7 @@ import { errorMessage } from "../utils/Popup";
 import { useSelector } from "react-redux";
 import Card from "../components/Leave/Card";
 import { useLocation } from "react-router-dom";
+import noLeave from "../assets/images/Leave/noLeave.svg"
 
 const Waiting = () => {
   const location=useLocation();
@@ -43,6 +44,16 @@ const Waiting = () => {
   return (
     <div>
       <Navbar />
+      {
+        leaves.length === 0 && (
+          <div className="flex items-center justify-center w-[100vw] h-[90vh] flex-col">
+            <div className="font-medium font-[oswald] text-xl"> No leave applications found</div>
+            <div className="w-[40vw]">
+              <img src={noLeave} alt="" />
+            </div>
+          </div>
+        )
+      }
       <div className="flex flex-wrap">
       {leaves.map((leave) => (
         <Card key={leave._id} leave={leave} />
