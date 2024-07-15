@@ -64,7 +64,15 @@ const userSchema = new Schema({
     leaves:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'leave'
-    }]
+    }],
+    lastMonthLeaveCount:{
+        type:Number,    
+        default:0
+    },
+    recentMonthLeaveCount:{
+        type:Number,
+        default:0
+    },
 });
 
 module.exports=mongoose.model("userModel", userSchema)

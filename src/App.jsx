@@ -15,6 +15,8 @@ import PendingApprovals from "./pages/PendingApprovals";
 import { useSelector } from "react-redux";
 import ApproveLeave from "./pages/ApproveLeave";
 import ApprovedLeaves from "./pages/ApprovedLeaves";
+import Community from "./pages/Community";
+import UserData from "./pages/UserData"
 
 function App() {
   const {user} = useSelector((state) => state.profile);
@@ -33,8 +35,16 @@ function App() {
         <Route
           path="/Login"
           element={
-            // <OpenRoute>
+            <OpenRoute>
               <Login />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="/community"
+          element={
+            // <OpenRoute>
+              <Community />
             // </OpenRoute>
           }
         />
@@ -48,7 +58,10 @@ function App() {
           path={ `/AllLeaves/user/:userId/leave/:leaveId`}
           element={<ApproveLeave />}
         />
-       
+        <Route
+          path={ `/community/userData/:id`}
+          element={<UserData />}
+        />
         <Route
           path={ `/ApprovedLeaves`}
           element={<ApprovedLeaves />}

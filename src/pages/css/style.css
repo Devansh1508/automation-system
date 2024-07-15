@@ -21,6 +21,10 @@
   animation: notApproved 3s infinite;
 }
 
+.circle{
+  border-radius: 50%;
+}
+
 @keyframes approved{
   0% {
       background-color: #ffffff; /* Initial color */

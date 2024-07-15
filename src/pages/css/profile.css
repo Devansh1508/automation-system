@@ -9,3 +9,7 @@
   grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 20px;
 }
+
+.profile{
+  background: linear-gradient(120deg, rgba(0,10,48,0.9150852577359069) 10%, rgba(206,210,211,1) 100%);
+}

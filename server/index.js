@@ -5,6 +5,7 @@ const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');  
 const leaveRoutes = require('./routes/leaves');
 const {cloudinaryConnect}=require('./config/cloudinary');
+const {auth}=require('./middlewares/auth');
 require('dotenv').config();
 
 const app = express();
@@ -36,5 +37,5 @@ app.get('/', (req, res) => {
 
 // routes 
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/profile', profileRoutes);
+app.use('/api/v1/profile', auth, profileRoutes);
 app.use('/api/v1/leaves', leaveRoutes);

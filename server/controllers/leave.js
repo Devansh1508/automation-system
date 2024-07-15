@@ -1,4 +1,3 @@
-const { all } = require('axios');
 const leaveModel = require('../models/leaveForm');
 const userModel = require('../models/user');
 const jwt = require('jsonwebtoken');
@@ -19,15 +18,26 @@ exports.createLeave = async (req, res) => {
                 message: "User not found"
             })
         }
-        const {nature, period, fromDate, toDate, prefixSuffix, grounds, address, responsibilities, extraWorkDate, clCoAvailed, remark} = req.body;
-        if(!nature || !period || !fromDate || !toDate || !grounds || !address || !responsibilities){
+        const {nature, fromDate, toDate, prefixSuffix, grounds, address, responsibilities, extraWorkDate, clCoAvailed, remark} = req.body;
+        if(!nature || !fromDate || !toDate || !grounds || !address || !responsibilities){
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
             })
         }
-
+        const today = new Date();
+        const toDateObj = new Date(toDate);
+        const fromDateObj = new Date(fromDate);
+        console.log("obj",fromDateObj,"to",toDateObj,"today",today);
+        if(fromDateObj.toISOString().split('T')[0]>toDateObj.toISOString().split('T')[0] || fromDateObj.toISOString().split('T')[0]<today.toISOString().split('T')[0] || toDateObj.toISOString().split('T')[0]<today.toISOString().split('T')[0]){
+            return res.status(400).json({
+                success: false,
+                message: "enter valid date"
+            })
+        }
+        const period = ((toDateObj-fromDateObj)/(1000 * 60 * 60 * 24))+1;
         const newLeave = await leaveModel.create({nature, period, fromDate, toDate, prefixSuffix, grounds, address, responsibilities, extraWorkDate, clCoAvailed, remark, user:validUser});
+        
         await validUser.leaves.push(newLeave._id);
         await validUser.save();
         console.log(newLeave);
@@ -208,7 +218,7 @@ exports.getAllLeaves = async (req, res) => {
 
         const allLeaves = await leaveModel.find();
 
-        console.log(allLeaves);
+        // console.log(allLeaves);
         return res.status(200).json({
             success: true,
             message: "Leave fetched successfully",
@@ -249,9 +259,7 @@ exports.approveLeave = async (req, res) => {
                 message: "leave cannot be approved"
             });
         }
-
         const durationOfLeave=((leave.toDate-leave.fromDate)/(1000 * 60 * 60 * 24))+1;
-        const leavePeriod = validUser.totalLeaves-durationOfLeave;
         if (leave.approved) {
             const currentTime = new Date();
             const approvalTime = new Date(leave.approvedAt);
@@ -259,19 +267,18 @@ exports.approveLeave = async (req, res) => {
 
             if (timeDifference < 5) {
                 await leaveModel.findByIdAndUpdate(leaveId, { approved: false, approvedAt: null, approvedBy: null});
-                await userModel.findByIdAndUpdate(applicant, {totalLeaves: validUser.totalLeaves+durationOfLeave});
+                await userModel.findByIdAndUpdate(applicant._id, {totalLeaves: validUser.totalLeaves+durationOfLeave});
+
             }else{
                 return res.status(400).json({
                     success: false,
                     message: "Leave approval cannot be reverted after 5 minutes of approval",
-                });
-            }
-
+                });        
+            }            
         } else {
             await leaveModel.findByIdAndUpdate(leaveId, { approved: true, approvedAt: new Date(), approvedBy:user});
-            await userModel.findByIdAndUpdate(applicant, {totalLeaves: leavePeriod});
+            await userModel.findByIdAndUpdate(applicant._id, {totalLeaves: validUser.totalLeaves-durationOfLeave});
         }
-
         return res.status(200).json({
             success: true,
             message: "Leave approval status updated successfully",
@@ -284,3 +291,68 @@ exports.approveLeave = async (req, res) => {
         });
     }
 };
+
+exports.getLeaveRequests = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = decoded.id;
+
+        // const user=req.body.id;
+
+        const validUser = await userModel.findById(user);
+        if (!validUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const leaveRequests = await LeaveForm.find().sort({ fromDate: -1 }).populate('user');
+        res.status(200).json({
+            success: true,
+            message: 'Leave requests fetched successfully',
+            data: leaveRequests
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'error occured while fetching leaves' });
+    }
+};
+
+exports.getUserLeaveRequests = async (req, res) => {
+    try{
+        const user = req.params.id;
+
+        const validUser= await userModel.findById(user);
+        if(!validUser){
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+
+        const allLeaves = validUser.leaves;
+        let leaves=new Map();
+
+        for (const leaveId of allLeaves) {
+            const leave=await leaveModel.findById(leaveId).exec();
+            const key=`${leave.fromDate.getMonth()}-${leave.fromDate.getFullYear()}`;
+            if(!leaves.has(key)){
+                leaves.set(key,[]);
+            }
+            leaves.get(key).push(leave);
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Leave fetched successfully",
+            data: Array.from(leaves.entries())
+        })
+    }catch(err){
+        return res.status(500).json({
+            success: false,
+            message: "error occurred while fetching leave"
+        })
+    }
+}
+ 

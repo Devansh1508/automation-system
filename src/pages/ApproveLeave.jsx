@@ -38,6 +38,8 @@ const LeaveCard = () => {
       if (data.success) {
         setLeave(data.data.leave);
         setApplicant(data.data.userRequestedForLeave);
+        if(data.data.leave.approved)
+        setApprove(data.data.leave.approved);
       } else {
         errorMessage(data.message);
       }
@@ -61,9 +63,10 @@ const LeaveCard = () => {
         }
       );
       const data = await response.json();
+      console.log("data:", data);
 
       if (data.success) {
-        if (approve === false) {
+        if (data.approve === false) {
           notify("Leave approved");
           setApprove(true);
         } else {

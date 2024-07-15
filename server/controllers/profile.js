@@ -1,6 +1,7 @@
 const { uploadImageToCloudinary } = require('../utils/imageUpload');
 const userModel = require('../models/user');
 const jwt = require('jsonwebtoken');
+const { login } = require('./user');
 require('dotenv').config();
 
 exports.updateProfilePicture = async (req, res) => {
@@ -63,7 +64,17 @@ exports.updateProfile = async (req, res) => {
 exports.getUserDetails=async(req,res)=>{
     try{
         const token = req.headers.authorization.split(" ")[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        let decoded;
+
+        try{
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        }catch(err){
+            console.log("err",err);
+            return res.status(400).json({
+                success:false,
+                message:"token expired",
+            })
+        }
         const id = decoded.id;
         if(!id){
             return res.status(400).json({
@@ -97,7 +108,6 @@ exports.getApplicantDetails=async(req,res)=>{
                 message:"id not found"
             })
         }
-
         const user=await userModel.findById(userId);
 
         return res.status(200).json({
@@ -113,3 +123,42 @@ exports.getApplicantDetails=async(req,res)=>{
         })
     }
 }
+
+exports.getAllUsers=async(req,res)=>{
+    try{
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const id = decoded.id;
+
+        const validUser=await userModel.findById(id);
+
+        if(!validUser || validUser.accountType!=="Registrar"){
+            return res.status(400).json({
+                success:false,
+                message:"invalid user"
+            })
+        }
+
+        const users=await userModel.find({});
+
+        if(!users){
+            return res.status(400).json({
+                success:false,
+                message:"No users found"
+            })
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"Users fetched successfully",
+            data:users
+        })
+    }catch(err){
+        return res.status(500).json({
+            success: false,
+            message: "error occurred while fetching users",
+            error:err.message
+        })
+    }
+}
+

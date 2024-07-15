@@ -52,13 +52,14 @@ const Profile = () => {
 
   const getProfile = async () => {
     try {
+      console.log("token", token);  
       const response = await fetch(
         "http://localhost:4000/api/v1/profile/getUserDetails",
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "authorization": `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
@@ -71,6 +72,7 @@ const Profile = () => {
         setAccountType(data.data.accountType);
       } else {
         errorMessage(data.message);
+        logoutClick();
       }
     } catch (err) {
       console.log("err:", err);

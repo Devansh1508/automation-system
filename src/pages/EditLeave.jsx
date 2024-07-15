@@ -57,7 +57,6 @@ const LeaveCard = () => {
 
   const getLeaves = async () => {
     try {
-      console.log("hello");
       const response = await fetch(
         `http://localhost:4000/api/v1/leaves/getLeave/${id}`,
         {
@@ -68,11 +67,9 @@ const LeaveCard = () => {
           },
         }
       );
-      console.log(response);
       const data = await response.json();
 
       if (data.success) {
-        console.log("data:", data.data);
         setLeave(data.data.leave);
       } else {
         errorMessage(data.message);

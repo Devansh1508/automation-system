@@ -7,6 +7,7 @@ const formatDate = (date) => new Date(date).toLocaleDateString();
 const Card = (leave) => {
     const { user } = useSelector((state) => state.profile);
     const [applicant, setApplicant] = useState({});
+    const {token} = useSelector((state) => state.auth);
 
     useEffect(() => {
         getUser();
@@ -21,12 +22,15 @@ const Card = (leave) => {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
             },
           }
         );
+
         const data = await response.json();
+        console.log("data:");
         if (data.success) {
-          console.log(data);
+          // console.log(data);
           setApplicant(data.data);
         }
       }
@@ -37,6 +41,7 @@ const Card = (leave) => {
 
   return (
     <div>
+      {console.log(leave.leave.user)}
       <Link to={`/AllLeaves/user/${user._id}/leave/${leave.leave._id}`}>
         <div className="rounded m-4 block w-[30vw] shadow-lg p-4 bg-[#f1f0f0] transform transition duration-500 hover:scale-105 hover:shadow-2xl">
           <div className="font-bold text-xl mb-2">{leave.leave.nature}</div>
