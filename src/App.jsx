@@ -9,7 +9,7 @@ import OpenRoute from "./components/common/OpenRoute";
 import { Routes, Route } from "react-router-dom";
 import ChangePassword from "./pages/ChangePassword";
 import LeaveForm from "./pages/LeaveForm";
-import MyRequest from "./pages/MyRequests";
+import MyRequests from "./pages/MyRequests";
 import EditLeave from "./pages/EditLeave";
 import PendingApprovals from "./pages/PendingApprovals";
 import { useSelector } from "react-redux";
@@ -48,7 +48,7 @@ function App() {
             // </OpenRoute>
           }
         />
-        <Route path="/myRequests" element={<MyRequest />} />
+        <Route path="/myRequests" element={<MyRequests />} />
         <Route path="/Otp" element={<OtpGenerate />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/" element={<Home />} />

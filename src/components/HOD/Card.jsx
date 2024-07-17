@@ -28,7 +28,7 @@ const Card = (leave) => {
         );
 
         const data = await response.json();
-        console.log("data:");
+        // console.log("data:");
         if (data.success) {
           // console.log(data);
           setApplicant(data.data);
@@ -41,9 +41,9 @@ const Card = (leave) => {
 
   return (
     <div>
-      {console.log(leave.leave.user)}
+      {/* {console.log("hello")} */}
       <Link to={`/AllLeaves/user/${user._id}/leave/${leave.leave._id}`}>
-        <div className="rounded m-4 block w-[30vw] shadow-lg p-4 bg-[#f1f0f0] transform transition duration-500 hover:scale-105 hover:shadow-2xl">
+        <div className="rounded flex flex-col m-4 w-[30vw] shadow-lg p-4 bg-[#f1f0f0] transform transition duration-500 hover:scale-105 hover:shadow-2xl">
           <div className="font-bold text-xl mb-2">{leave.leave.nature}</div>
           <p className="text-gray-700 text-base">
             <strong>Period:</strong> {leave.leave.period}
@@ -67,7 +67,7 @@ const Card = (leave) => {
           <p className="text-gray-700 text-base">
             <strong>Name: {applicant.firstName +" " + applicant.lastName}</strong> 
           </p>
-          <p className="text-gray-700 text-base">
+          <p className="text-gray-700 max-xl:text-xs ">
             <strong>Email: {applicant.email}</strong> 
           </p>
           <p className="text-gray-700 text-base">

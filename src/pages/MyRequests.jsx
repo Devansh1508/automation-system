@@ -6,7 +6,7 @@ import Card from "../components/Leave/Card";
 import { useLocation } from "react-router-dom";
 import noLeave from "../assets/images/Leave/noLeave.svg"
 
-const Waiting = () => {
+const MyRequests = () => {
   const location=useLocation();
   const { token } = useSelector((state) => state.auth);
   const [leaves, setLeaves] = useState([]);
@@ -28,7 +28,8 @@ const Waiting = () => {
         }
       );
       const data = await response.json();
-
+      console.log("response:", data);
+      
       if (data.success) {
         console.log("data:", data.data);
         setLeaves(data.data);
@@ -54,13 +55,25 @@ const Waiting = () => {
           </div>
         )
       }
+      {
+        leaves.length !== 0 && (
+          <div>
+            <div className="flex absolute items-center justify-center w-[100vw] h-[90vh] flex-col">
+            {/* <div className="font-medium font-[oswald] text-xl"> No leave applications found</div> */}
+            <div className="w-[40vw] opacity-30">
+              <img src={noLeave} alt="" />
+            </div>
+          </div>
+        
       <div className="flex flex-wrap">
       {leaves.map((leave) => (
         <Card key={leave._id} leave={leave} />
       ))}
       </div>
+          </div>)
+    }
     </div>
   );
 };
 
-export default Waiting;
+export default MyRequests;

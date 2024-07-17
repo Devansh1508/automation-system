@@ -42,11 +42,13 @@ const Registrar = () => {
   return (
     <div>
       <Navbar />
+      <div className='flex flex-wrap'>
       {
         leave.map((leave) => (
           <Card key={leave._id} leave={leave} />
         ))
       }
+          </div>
     </div>
   )
 }

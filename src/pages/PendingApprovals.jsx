@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/common/Navbar";
 import { useSelector } from "react-redux";
 import Card from "../components/HOD/Card";
+import pendingApprovals from "../assets/images/pending approval/pendingApprovals.svg";
 
 const AllLeaves = () => {
   const { user } = useSelector((state) => state.profile);
@@ -26,7 +27,7 @@ const AllLeaves = () => {
       );
       const data = await response.json();
       if (data.success) {
-        console.log(data);
+        // console.log(data);
         setLeaveData(data.data);
       }
     } catch (err) {
@@ -37,11 +38,21 @@ const AllLeaves = () => {
   return (
     <div>
       <Navbar />
+      {console.log(leaveData)}
+      {leaveData.length === 0 && (
+        <div className="flex items-center justify-center w-[100vw] h-[90vh] flex-col">
+        <div className="font-medium font-[oswald] text-xl"> No leave applications found</div>
+        <div className="w-[40vw]">
+          <img src={pendingApprovals} alt="" />
+        </div>
+      </div>
+      )  
+      }
       <div className="flex flex-wrap">
         {leaveData&&(
-          leaveData.map((leave) => (
-          <Card key={leave._id} leave={leave} />
-        )))
+          leaveData.map((leave) =>(
+             <Card key={leave._id} leave={leave} />
+          )))
         }
       </div>
     </div>

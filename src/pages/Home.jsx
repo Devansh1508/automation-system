@@ -11,8 +11,7 @@ const Home = () => {
       <div className="w-11/12 h-11/12 flex flex-row">
         <div className="mt-[30vh] ml-[10vw] w-[40%] h-[100%]">
           <p className="text-4xl">
-            Welcome to the the <br /> Automation system of <br />
-            IIIT Pune
+            Welcome to the the <br />Leave Automation system <br />
           </p>
 
           <div className="mt-[3vh] h-[12vh]">

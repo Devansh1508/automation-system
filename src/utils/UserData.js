@@ -1,10 +1,11 @@
 const getMonthlyLeaves = (leave) => {
     let duration=0;
-    if(leave[1].approved){
-        leave[1].forEach(data=>{
+    console.log("hello",leave[1]);
+    leave[1].forEach(data=>{
+            if(data.approved){
             duration+=Number(data.period);
+        }
         })
-    }
     return duration;
 }
 
