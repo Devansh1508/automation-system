@@ -173,30 +173,44 @@ exports.getApprovedLeaves = async (req, res) => {
             })
         }
 
-        const allLeaves = await leaveModel.find({ approved: true });
-        let filteredLeaves = []
-        console.log(allLeaves);
-        allLeaves.filter(async (leave) => {
+        const currentDate=new Date();
+        const fetchedLeaves = await leaveModel.find({ approved: true,});
+        let filteredLeaves = [];
+        fetchedLeaves.filter(async (leave) => {
             const currentTime = new Date();
-            if (currentTime - leave.approvedAt > 5 * 60 * 1000 && leave.approvedAt !== null) {
+            const approvedAt=leave.approvedAt;
+            // if (currentTime - leave.approvedAt > 5 * 60 * 1000 && leave.approvedAt !== null) {
                 filteredLeaves.push(leave)
                 return leave;
-            }
+            // }
         })
+        // console.log(fetchedLeaves)
 
-        const updatedLeaves = await Promise.all(allLeaves.map(async (leave) => {
-            const user = await userModel.findById(leave.approvedBy);
-            return {
-                ...leave.toObject(),
-                name: `${user.firstName} ${user.lastName}`,
-                email: user.email
-            };
-        }));
+        let leaveMap=new Map();
+        for (const leave of filteredLeaves) {
+            const appliedUser = await userModel.findById(leave.user);
+            const data={...leave.toObject(),firstName:appliedUser.firstName,lastName:appliedUser.lastName,email:appliedUser.email};
+            const approvedDate = leave.approvedAt.toDateString();
+
+            if (!leaveMap.has(approvedDate)) {
+                leaveMap.set(approvedDate, [data]);
+            } else {
+                leaveMap.get(approvedDate).push(data);
+            }
+        }
+        // console.log(leaveMap.get('Mon Jul 15 2024'));
+
+        
+        let leaveData=[];
+        leaveMap.forEach(function(value,key){
+            const temp=[key,value]
+            leaveData.push(temp);
+        });
 
         return res.status(200).json({
             success: true,
             message: "Leave fetched successfully",
-            data: updatedLeaves
+            data: leaveData
         })
     } catch (err) {
         return res.status(500).json({
@@ -221,14 +235,15 @@ exports.getAllLeaves = async (req, res) => {
         const allLeaves = await leaveModel.find();
         const filteredLeaves=allLeaves.filter((leave) => {
             const currentTime = new Date();
+            currentTime.setUTCHours(0, 0, 0, 0);
             const approvedAt = new Date(leave.approvedAt);
             const from = new Date(leave.fromDate);
-            if ((currentTime - approvedAt < 5 * 60 * 1000 || leave.approvedAt===null) && leave.approved !== null && from>currentTime) {
+            const time=new Date();
+            if ((time - approvedAt < 5 * 60 * 1000 || leave.approvedAt===null) && leave.approved !== null && from>=currentTime) {
                 return leave;   
-            }
+            }   
         })
 
-            // console.log(allLeaves);
             return res.status(200).json({
                 success: true,
                 message: "Leave fetched successfully",
@@ -270,7 +285,7 @@ exports.approveLeave = async (req, res) => {
                     message: "leave cannot be approved"
                 });
             }
-            const durationOfLeave = ((leave.toDate - leave.fromDate) / (1000 * 60 * 60 * 24)) + 1;
+            let durationOfLeave = ((leave.toDate - leave.fromDate) / (1000 * 60 * 60 * 24)) + 1;
             if (leave.approved) {
                 const currentTime = new Date();
                 const approvalTime = new Date(leave.approvedAt);
@@ -278,8 +293,10 @@ exports.approveLeave = async (req, res) => {
 
                 if (timeDifference < 5) {
                     await leaveModel.findByIdAndUpdate(leaveId, { approved: false, approvedAt: null, approvedBy: null });
-                    await userModel.findByIdAndUpdate(applicant._id, { totalLeaves: validUser.totalLeaves + durationOfLeave });
-
+                    if(validUser.totalLeaves!==0)
+                        await userModel.findByIdAndUpdate(applicant._id, { totalLeaves: validUser.totalLeaves + durationOfLeave });
+                    else
+                        await userModel.findByIdAndUpdate(applicant._id,{unpaidLeaves: validUser.unpaidLeaves-durationOfLeave});
                 } else {
                     return res.status(400).json({
                         success: false,
@@ -288,8 +305,18 @@ exports.approveLeave = async (req, res) => {
                 }
             } else {
                 await leaveModel.findByIdAndUpdate(leaveId, { approved: true, approvedAt: new Date(), approvedBy: user });
-                await userModel.findByIdAndUpdate(applicant._id, { totalLeaves: validUser.totalLeaves - durationOfLeave });
+                if(validUser.totalLeaves<durationOfLeave){
+                    console.log("Hello");
+                    console.log("applicant",applicant,"\nvalidUser",validUser);
+                    
+                    durationOfLeave-=applicant.totalLeaves;
+
+                    await userModel.findByIdAndUpdate(applicant._id,{totalLeaves:0, unpaidLeaves:applicant.unpaidLeaves+durationOfLeave});
+                    console.log("Hello1");
+                }
+                else {await userModel.findByIdAndUpdate(applicant._id, { totalLeaves: applicant.totalLeaves - durationOfLeave });}
             }
+            
             return res.status(200).json({
                 success: true,
                 message: "Leave approval status updated successfully",

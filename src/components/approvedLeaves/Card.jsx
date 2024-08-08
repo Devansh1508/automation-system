@@ -2,13 +2,14 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";  
 
-const Card = (leave) => {
+const Card = (leave,leaveData) => {
   const formatDate = (date) => new Date(date).toLocaleDateString();
 
   const { user } = useSelector((state) => state.profile);
 
   return (
     <div>
+      {console.log("leaveCard:", leave)}
       <Link 
         to={`/EditLeave/${leave.leave._id}`}
       >
