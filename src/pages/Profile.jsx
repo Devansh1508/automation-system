@@ -245,7 +245,7 @@ const Profile = () => {
               <div className="gap-4 flex flex-wrap my-8  h-[70%] w-[100%]">
                 <Card title="Email" data={user?.email} />
                 <Card title="Mobile Number" data={user?.mobileNumber} />
-                <Card title="Remaining paid leaves" data={user?.totalLeaves} />
+                <Card title="Remaining paid leaves" data={user?.paidLeaves} />
                 <Card title="Unpaid Leaves" data={user?.unpaidLeaves} />
               </div>
               <div className="flex">

@@ -57,7 +57,7 @@ const userSchema = new Schema({
         default:"",
         length:10,
     },
-    totalLeaves:{
+    paidLeaves:{    
         type:Number,
         default:12
     },
