@@ -19,7 +19,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if(!email){
-        errorMessage("Email is required");
+        errorMessage("Please Enter Email Properly");
         return;
     }
     // if email will be sent then we will send the emailSent flag will be set as true
