@@ -49,7 +49,7 @@ const ForgotPassword = () => {
 
     } catch (error) {
       console.log("email", email);
-      errorMessage("Failed to send email for resetting password");
+      errorMessage("Failed to reset password");
       console.log("RESET PASSWORD TOKEN Error", error);
       //   toast.error("Failed to send email for resetting password");
     }
