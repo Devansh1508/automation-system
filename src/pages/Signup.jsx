@@ -121,6 +121,8 @@ const Signup = () => {
               >
                 <select {...register("accountType",)}>
                   <option value="HOD">HOD</option>
+                  <option value="Assistant Professor">Assistant Professor</option>
+                  <option value="Director">Director</option>
                   <option value="Registrar">Registrar</option>
                   <option value="Other">Other</option>
                 </select>

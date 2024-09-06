@@ -4,6 +4,110 @@ const userModel = require('../models/user');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+// a common function for getting all leaves
+// which are yet to be approved 
+const fetchLeave=async(user)=>{
+    const accountType = user.accountType;
+        const userType=new Map([["HOD","approvedAtHOD"],["Registrar","approvedAtRegistrar"],["Director","approvedAtDirector"]]);
+
+        const allLeaves = await leaveModel.find();
+        console.log(allLeaves)
+        const filteredLeaves = allLeaves.filter((leave) => {
+            const currentTime = new Date();
+            currentTime.setUTCHours(0, 0, 0, 0);
+
+            const approvedAtField=userType.get(accountType);
+            const approvedAt = new Date(leave[approvedAtField]);
+            const from = new Date(leave.fromDate);
+            const time = new Date();
+                    // console.log("hello from filter")
+                    // console.log("time",(time-approvedAt)/ 5 * 60 * 1000 );
+            if ((time - approvedAt < 5 * 60 * 1000 ||
+                 leave[approvedAtField] === null) 
+                 && leave.approved !== null
+                 && from >= currentTime
+                ) {
+                return leave;
+            }
+        })
+        console.log("filtered leaves",filteredLeaves)
+        return filteredLeaves;
+}
+
+// common function to approve leave for different roles of user 
+// user ---> the person who is approving the leaves
+// status ---> is leave approved or not  
+const approveLeave = async (user,leaveId,status) => {
+        const validUser = await userModel.findById(user);
+        if (!validUser) {
+            return {
+                success: false,
+                message: "User not found"
+            };
+        }
+
+        const leave = await leaveModel.findById(leaveId);
+        if (!leave) {
+            return {
+                success: false,
+                message: "Leave not found"
+            };
+        }
+
+        const applicant = req.body.applicant;
+        if (!applicant) {
+            return {
+                success: false,
+                message: "leave cannot be approved"
+            };
+        }
+        let durationOfLeave = ((leave.toDate - leave.fromDate) / (1000 * 60 * 60 * 24)) + 1;
+
+        if (status) {
+            const currentTime = new Date();
+            const approvalTime = new Date(leave.approvedAt);
+            const timeDifference = (currentTime - approvalTime) / (1000 * 60);
+            if (timeDifference < 5) {
+                await leaveModel.findByIdAndUpdate(leaveId, {approvedAt: null, approvedBy: null });
+                // approvedBy: null 
+                console.log(applicant._id)
+                console.log("hello",durationOfLeave)
+                if (applicant.unpaidLeaves===0) {
+                    await userModel.findByIdAndUpdate(applicant._id, { unpaidLeaves: 0, paidLeaves: validUser.paidLeaves + durationOfLeave });
+                }
+                else if(applicant.unpaidLeaves!==0 && applicant.paidLeaves===0){
+                    durationOfLeave=durationOfLeave- applicant.unpaidLeaves;
+                    await userModel.findByIdAndUpdate(applicant._id, { unpaidLeaves: 0,
+                        paidLeaves: validUser.paidLeaves + durationOfLeave });
+                }
+                else if (applicant.paidLeaves===0 && applicant.unpaidLeaves===0) {
+                    await userModel.findByIdAndUpdate(applicant._id, {paidLeaves: validUser.paidLeaves + durationOfLeave});
+                }
+            }
+            else {
+                return {
+                    success: false,
+                    message: "Leave approval cannot be reverted after 5 minutes of approval",
+                };
+            }
+        } else {
+            await leaveModel.findByIdAndUpdate(leaveId, {approvedAt: new Date(), approvedBy: validUser });
+            // approvedBy: null 
+            if (durationOfLeave > applicant.paidLeaves) {
+                durationOfLeave = durationOfLeave - applicant.paidLeaves;
+                await userModel.findByIdAndUpdate(applicant._id, { unpaidLeaves: validUser.unpaidLeaves + durationOfLeave, paidLeaves: 0 });
+            }
+            else {
+                console.log("paid leave",validUser.paidLeaves)
+                await userModel.findByIdAndUpdate(applicant._id, { paidLeaves: validUser.paidLeaves - durationOfLeave });
+            }
+        }
+
+        return {
+            success:true,
+        }
+};
+
 exports.createLeave = async (req, res) => {
     try {
         const token = req.headers.authorization.split(" ")[1];
@@ -220,8 +324,8 @@ exports.getApprovedLeaves = async (req, res) => {
     }
 }
 
-// hod 
-exports.getAllLeaves = async (req, res) => {
+//just fetching leaves for approval
+exports.pendingApprovalDirector = async (req, res) => {
     try {
         const user = req.params.id;
         const validUser = await userModel.findById(user);
@@ -232,17 +336,108 @@ exports.getAllLeaves = async (req, res) => {
             })
         }
 
-        const allLeaves = await leaveModel.find();
-        const filteredLeaves = allLeaves.filter((leave) => {
-            const currentTime = new Date();
-            currentTime.setUTCHours(0, 0, 0, 0);
-            const approvedAt = new Date(leave.approvedAt);
-            const from = new Date(leave.fromDate);
-            const time = new Date();
-            if ((time - approvedAt < 5 * 60 * 1000 || leave.approvedAt === null) && leave.approved !== null && from >= currentTime) {
-                return leave;
-            }
+        const leaves=await fetchLeave(validUser);
+
+        const filteredLeaves = await Promise.all(
+            leaves.map(async (leave) => {
+              try {
+                const applicant = await userModel.findById(leave.user);
+                if(applicant.accountType==="Registrar")
+                    return leave;
+              } catch (error) {
+                console.error(`Error fetching user for leave ${leave._id}:`, error);
+                return null;
+              }
+            })
+          );
+
+        return res.status(200).json({
+            success: true,
+            message: "Leave fetched successfully for Director",
+            data: filteredLeaves
         })
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "error occurred while fetching leave for Director"
+        })
+    }
+}
+
+exports.pendingApprovalRegistrar = async (req, res) => {
+    try {
+        const user = req.params.id;
+        const validUser = await userModel.findById(user);
+        if (!validUser) {
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+        
+        const leaves=await fetchLeave(validUser);
+        // console.log("length", leaves);
+        // filtering leaves for registrar
+        let filteredLeaves = await Promise.all(
+            leaves.map(async (leave) => {
+                try {
+                    const applicant = await userModel.findById(leave.user);
+                    // assistantProfessor after HOD approval
+                    // other ---> staff 
+                    if((applicant.accountType==="Assistant Professor" && leave.approvedByHOD)||applicant.accountType==="Other"||applicant.accountType==="HOD")
+                        return leave;
+                    else return null;
+                } catch (error) {
+                    console.error(`Error fetching user for leave ${leave._id}:`, error);
+                    return null;
+                }
+            })
+        );
+        filteredLeaves = filteredLeaves.filter(leave => leave !== null);
+        
+        console.log("hello from registrar",filteredLeaves)
+        return res.status(200).json({
+            success: true,
+            message: "Leave fetched successfully for registrar",
+            data: filteredLeaves
+        })
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "error occurred while fetching leave for registrar"
+        })
+    }
+}
+
+exports.pendingApprovalHOD = async (req, res) => {
+    try {
+        const user = req.params.id;
+        const validUser = await userModel.findById(user);
+        if (!validUser) {
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+        const leaves=await fetchLeave(validUser);
+        // filteredLeaves
+        // only assistant Professor leave will be shown to HOD
+        let filteredLeaves=await Promise.all(
+            leaves.map(async(leave)=>{
+                try{
+                    const applicant=await userModel.findById(leave.user);
+                    if(applicant.accountType==="Assistant Professor"){
+                        return leave;
+                    }
+                    else return null;
+                }catch(err){
+                    console.error(`Error fetching user for leave ${leave._id} for HOD:`, error);
+                    return null;
+                }
+            })
+        )
+        filteredLeaves=filteredLeaves.filter(leave=>leave!==null);
+        console.log("filtered",filteredLeaves);
 
         return res.status(200).json({
             success: true,
@@ -257,85 +452,114 @@ exports.getAllLeaves = async (req, res) => {
     }
 }
 
-// exports.approveLeave = async (req, res) => {
-//         try {
-//             const user = req.params.userId;
-//             const validUser = await userModel.findById(user);
-//             if (!validUser) {
-//                 return res.status(400).json({
-//                     success: false,
-//                     message: "User not found"
-//                 });
-//             }
+// approve leave 
+// approval from hod 
+exports.approveLeavebyHOD = async (req, res) => {
+    try{
+        const user=req.params.userId;
+        const leaveId=req.params.leaveId;
+        const leave = await leaveModel.findById(leaveId);
+        if (!leave) {
+            return res.status(400).json({
+                success: false,
+                message: "Leave not found"
+            });
+        }
 
-//             const leaveId = req.params.leaveId;
-//             const leave = await leaveModel.findById(leaveId);
-//             if (!leave) {
-//                 return res.status(400).json({
-//                     success: false,
-//                     message: "Leave not found"
-//                 });
-//             }
-//             const status = leave.approved;
+        const status=await approveLeave(user,leave,leave.approvedByHOD);
 
-//             const applicant = req.body.applicant;
-//             if (!applicant) {
-//                 return res.status(400).json({
-//                     success: false,
-//                     message: "leave cannot be approved"
-//                 });
-//             }
-//             let durationOfLeave = ((leave.toDate - leave.fromDate) / (1000 * 60 * 60 * 24)) + 1;
-//             if (leave.approved) {
-//                 const currentTime = new Date();
-//                 const approvalTime = new Date(leave.approvedAt);
-//                 const timeDifference = (currentTime - approvalTime) / (1000 * 60);
+        if(status.success){
+            return res.status(200).json({
+                success: true,
+                message: status.message,
+            });
+        }
+        
+        return res.status(400).json({
+            success: false,
+            message: "leave approved by HOD",
+        });
+        
+    }catch(err){
+        return res.status(500).json({
+            success: false,
+            message: "error occurred while updating leave approval status",
+            errorMessage: err.message
+        });
+    }
+}
 
-//                 if (timeDifference < 5) {
-//                     await leaveModel.findByIdAndUpdate(leaveId, { approved: false, approvedAt: null, approvedBy: null });
-//                     if(validUser.totalLeaves!==0)
-//                         await userModel.findByIdAndUpdate(applicant._id, { totalLeaves: validUser.totalLeaves + durationOfLeave });
-//                     else
-//                         await userModel.findByIdAndUpdate(applicant._id,{unpaidLeaves: validUser.unpaidLeaves-durationOfLeave});
-//                 } else {
-//                     return res.status(400).json({
-//                         success: false,
-//                         message: "Leave approval cannot be reverted after 5 minutes of approval",
-//                     });
-//                 }
-//             } else {
-//                 await leaveModel.findByIdAndUpdate(leaveId, { approved: true, approvedAt: new Date(), approvedBy: user });
-//                 if (validUser.totalLeaves < durationOfLeave) {
-//                     const remainingLeave = durationOfLeave - validUser.totalLeaves;
-//                     console.log("remaining leave", remainingLeave);
-//                     await userModel.findByIdAndUpdate(applicant._id, {
-//                         totalLeaves: 0,
-//                         unpaidLeaves: applicant.unpaidLeaves + remainingLeave
-//                     });
-//                 } else {
-//                     await userModel.findByIdAndUpdate(applicant._id, {
-//                         // total leaves ---> paid leaves 
-//                         totalLeaves: applicant.totalLeaves - durationOfLeave
-//                     });
-//                 }
-//             }
+exports.approveLeavebyRegistrar = async (req, res) => {
+    try{
+        const user=req.params.userId;
+        const leaveId=req.params.leaveId;
+        const leave = await leaveModel.findById(leaveId);
+        if (!leave) {
+            return res.status(400).json({
+                success: false,
+                message: "Leave not found"
+            });
+        }
 
-//             return res.status(200).json({
-//                 success: true,
-//                 message: "Leave approval status updated successfully",
-//                 status: !status
-//             });
-//         } catch (err) {
-//             return res.status(500).json({
-//                 success: false,
-//                 message: "Error occurred while updating leave approval status",
-//                 errorMessage: err.message
-//             });
-//         }
-//     };
+        const status=await approveLeave(user,leave,leave.approvedByRegistrar);
 
+        if(status.success){
+            return res.status(200).json({
+                success: true,
+                message: "Leave approved by registrar",
+            });
+        }
+        
+        return res.status(400).json({
+            success: false,
+            message: status.message,
+        });
 
-// validUser and applicant both are the same 
+    }catch(err){
+        return res.status(500).json({
+            success: false,
+            message: "error occurred while updating leave approval status",
+            errorMessage: err.message
+        });
+    }
+}
+
+exports.approveLeavebyDirector = async (req, res) => {
+    try{
+        const user=req.params.userId;
+        const leaveId=req.params.leaveId;
+        const leave = await leaveModel.findById(leaveId);
+        if (!leave) {
+            return res.status(400).json({
+                success: false,
+                message: "Leave not found"
+            });
+        }
+
+        const status=await approveLeave(user,leave,leave.approvedByRegistrar);
+
+        if(status.success){
+            return res.status(200).json({
+                success: true,
+                message: "Leave approved by director",
+            });
+        }
+        
+        return res.status(400).json({
+            success: false,
+            message: status.message,
+        });
+
+    }catch(err){
+        return res.status(500).json({
+            success: false,
+            message: "error occurred while updating leave approval status",
+            errorMessage: err.message
+        });
+    }
+}
+
+// have to be deleted 
 exports.approveLeave = async (req, res) => {
     try {
         const user = req.params.userId;

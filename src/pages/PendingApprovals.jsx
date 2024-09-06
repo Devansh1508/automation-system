@@ -16,8 +16,20 @@ const AllLeaves = () => {
 
   const getAllLeaves = async () => {
     try {
+      // selecting the api based on the account type of the user
+      let api;
+      if(user.accountType==="HOD"){
+        api=`http://localhost:4000/api/v1/leaves/pendingApprovalHOD`
+      } 
+      else if(user.accountType==="Registrar"){
+        api=`http://localhost:4000/api/v1/leaves/pendingApprovalRegistrar`
+      }
+      else if(user.accountType==="Director"){
+        api=`http://localhost:4000/api/v1/leaves/pendingApprovalDirector`
+      }
+
       const response = await fetch(
-        `http://localhost:4000/api/v1/leaves/getAllLeaves/${id}`,
+        `${api}/${id}`,
         {
           method: "GET",
           headers: {

@@ -23,7 +23,8 @@ const userSchema = new Schema({
     },
     accountType:{
         type:String,
-        enum:['HOD','Other','Registrar'],
+        // Other ---> staff 
+        enum:['HOD','Other','Registrar','Assistant Professor','Director'],
         required:true
     },
     image:{

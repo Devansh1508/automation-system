@@ -85,6 +85,7 @@ exports.getUserDetails=async(req,res)=>{
 
         const user=await userModel.findById(id);
 
+        // console.log("user");   
         return res.status(200).json({
             success:true,
             message:"Profile fetched successfully",

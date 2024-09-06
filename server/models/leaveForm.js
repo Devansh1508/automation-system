@@ -51,14 +51,32 @@ const leaveFormSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  approved:{
+  approvedByHOD:{
     type: Boolean,
     default: false
   },
-  approvedAt:{
+  approvedByRegistrar:{
+    type: Boolean,
+    default: false
+  },
+  approvedByDirector:{
+    type: Boolean,
+    default: false
+  },
+  // when different users approve the leave form, we need to keep track of the time of approval
+  approvedAtHOD:{
     type: Date,
     default: null
   },
+  approvedAtDirector:{
+    type: Date,
+    default: null
+  },
+  approvedAtRegistrar:{
+    type: Date,
+    default: null
+  },
+  
   approvedBy:{
     type: Schema.Types.ObjectId,
     ref: 'User'

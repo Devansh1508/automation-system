@@ -66,6 +66,43 @@ exports.isRegistrar = (req, res, next) => {
         })
     }
 }
+
+exports.isDirector = (req, res, next) => {
+    try {
+        if (req.user.accountType !== "Director") {
+            return res.status(403).json({
+                success: false,
+                message: "you are not authorized to access this route"
+            })
+        }
+        next();
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "user role is not matching",
+            error: err.message
+        })
+    }
+}
+
+exports.isAssistantProfessor = (req, res, next) => {
+    try {
+        if (req.user.accountType !== "Assistant Professor") {
+            return res.status(403).json({
+                success: false,
+                message: "you are not authorized to access this route"
+            })
+        }
+        next();
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "user role is not matching",
+            error: err.message
+        })
+    }
+}
+
 exports.isOther = (req, res, next) => {
     try {
         if (req.user.accountType !== "Other") {

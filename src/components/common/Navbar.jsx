@@ -49,20 +49,20 @@ const Navbar = () => {
               My Requests
             </div>
           </Link>
-          {user.accountType === "HOD" && (
+          {/* {user.accountType === "HOD" && ( */}
             <Link to={`/PendingApprovals/${user._id}`}>
               <div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300 mr-4">
                 Pending Approvals
               </div>
             </Link>
-          )}
+          {/* )} */}
           {user.accountType === "Registrar" && (
             <div>
-              <Link to="/ApprovedLeaves">
+              {/* <Link to="/ApprovedLeaves">
                 <div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300 mr-4">
                   Approved Leaves
                 </div>
-              </Link>
+              </Link> */}
 
               <Link to="/community">
                 <div className="block md:inline-block mt-4 md:mt-0 text-white hover:text-gray-300 mr-4">

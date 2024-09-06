@@ -178,6 +178,8 @@ exports.login = async (req, res) => {
     }
   };
 
+
+  // not used till now 
   exports.deleteUser = async (req, res) => {
     try{
       const id=req.user.id;

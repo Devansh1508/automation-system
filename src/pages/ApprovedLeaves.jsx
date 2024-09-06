@@ -8,6 +8,8 @@ import noLeave from "../assets/images/Leave/noLeave.svg";
 const Registrar = () => {
   const [leave, setLeave] = useState([]);
   const { token } = useSelector((state) => state.auth);
+  const {user}=useSelector((state)=>state.profile);
+  const id=user._id;
 
   useEffect(() => {
     getApprovedLeaves();
@@ -17,12 +19,12 @@ const Registrar = () => {
     try {
       console.log("hello");
       const response = await fetch(
-        `http://localhost:4000/api/v1/leaves/getApprovedLeaves`,
+        `http://localhost:4000/api/v1/leaves/pendingApprovalRegistrar/${id}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            authorization: `Bearer ${token}`,
+            // authorization: `Bearer ${token}`,
           },
         }
       );

@@ -177,6 +177,8 @@ const Profile = () => {
                     }}
                   >
                     <option value="HOD">HOD</option>
+                    <option value="Assistant Professor">Assistant Professor</option>
+                    <option value="Director">Director</option>
                     <option value="Registrar">Registrar</option>
                     <option value="Other">Other</option>
                   </select>
@@ -199,13 +201,20 @@ const Profile = () => {
                     }}
                   />
                 </div>
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
                   <button
                     type="submit"
                     onClick={updateProfile}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    className="bg-blue-500 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded"
                   >
                     Update
+                  </button>
+                  
+                  <button
+                    onClick={editClick}
+                    className="bg-[#AA0101] hover:bg-[#7f1717] text-white font-bold py-2 px-4 rounded"
+                  >
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -237,9 +246,9 @@ const Profile = () => {
                 >
                   {user?.firstName + " " + user?.lastName}
                 </p>
-                <div className="duration-300 hover:scale-110 transition-all flex-col gap-1 p-8 w-[7vw] mx-4 rounded-md flex items-center justify-center text-white bg-[#212c54e7]">
+                <div className="duration-300 hover:scale-110 transition-all flex-col gap-1 p-8 min-w-[7vw] mx-4 rounded-md flex items-center justify-center text-white bg-[#212c54e7]">
                   <p className=" text-[#e9e3e3d7]">post</p>
-                  <p name="accountType">{user?.accountType}</p>
+                  <p>{user?.accountType}</p>
                 </div>
               </div>
               <div className="gap-4 flex flex-wrap my-8  h-[70%] w-[100%]">
