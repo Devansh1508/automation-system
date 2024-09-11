@@ -51,19 +51,21 @@ const leaveFormSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
+  // kis user ne approval kiya 
   approvedByHOD:{
-    type: Boolean,
-    default: false
+    type: Schema.Types.ObjectId,
+    ref: 'User'
   },
   approvedByRegistrar:{
-    type: Boolean,
-    default: false
+    type: Schema.Types.ObjectId,
+    ref: 'User'
   },
   approvedByDirector:{
-    type: Boolean,
-    default: false
+    type: Schema.Types.ObjectId,
+    ref: 'User'
   },
-  // when different users approve the leave form, we need to keep track of the time of approval
+  // when different users approve the leave form,
+  //  we need to keep track of the time of approval
   approvedAtHOD:{
     type: Date,
     default: null
@@ -76,11 +78,18 @@ const leaveFormSchema = new Schema({
     type: Date,
     default: null
   },
-  
-  approvedBy:{
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-  }
+  statusHOD:{
+    type: Boolean,
+    default: 0
+  },
+  statusRegistrar:{
+    type: Boolean,
+    default: 0
+  },
+  statusDirector:{
+    type: Boolean,
+    default: 0
+  },
 }, {
   timestamps: true
 });

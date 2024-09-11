@@ -1,13 +1,12 @@
 const express = require('express');
 const router=express.Router();
 
-const {approveLeave,getMyLeave, pendingApprovalDirector, pendingApprovalHOD,pendingApprovalRegistrar,  getUserLeaveRequests, getLeaveRequests,createLeave,deleteLeave,getLeave,getApprovedLeaves,approveLeavebyDirector,approveLeavebyHOD,approveLeavebyRegistrar}=require('../controllers/leave');
+const {getMyLeave, pendingApprovalDirector, pendingApprovalHOD,pendingApprovalRegistrar,  getUserLeaveRequests, getLeaveRequests,createLeave,deleteLeave,getLeave,approveLeavebyDirector,approveLeavebyHOD,approveLeavebyRegistrar}=require('../controllers/leave');
 
-router.put('/approveLeave/user/:userId/leave/:leaveId',approveLeave);
-router.get('/getApprovedLeaves',getApprovedLeaves);
+router.put('/approveLeavebyDirector/user/:userId/leave/:leaveId',approveLeavebyDirector);
+router.put('/approveLeavebyHOD/user/:userId/leave/:leaveId',approveLeavebyHOD);
+router.put('/approveLeavebyRegistrar/user/:userId/leave/:leaveId',approveLeavebyRegistrar);
 // router.get('/getAllLeaves/:id',getAllLeaves);
-
-router.put('')
 
 router.get('/pendingApprovalDirector/:id',pendingApprovalDirector);
 router.get('/pendingApprovalHOD/:id',pendingApprovalHOD);

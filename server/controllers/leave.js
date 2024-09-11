@@ -37,24 +37,26 @@ const fetchLeave=async(user)=>{
 // common function to approve leave for different roles of user 
 // user ---> the person who is approving the leaves
 // status ---> is leave approved or not  
-const approveLeave = async (user,leaveId,status) => {
-        const validUser = await userModel.findById(user);
-        if (!validUser) {
-            return {
-                success: false,
-                message: "User not found"
-            };
-        }
-
-        const leave = await leaveModel.findById(leaveId);
+const approveLeave = async (userId,leaveId,status) => {
+    // validUser----> the person who is approving the leave
+    const validUser = await userModel.findById(userId);
+    if (!validUser) {
+        return {
+            success: false,
+            message: "User not found"
+        };
+    }
+    
+    const leave = await leaveModel.findById(leaveId);
         if (!leave) {
             return {
                 success: false,
                 message: "Leave not found"
             };
         }
-
-        const applicant = req.body.applicant;
+        
+        const applicantId = leave.user;
+        const applicant = await userModel.findById(applicantId);
         if (!applicant) {
             return {
                 success: false,
@@ -62,26 +64,30 @@ const approveLeave = async (user,leaveId,status) => {
             };
         }
         let durationOfLeave = ((leave.toDate - leave.fromDate) / (1000 * 60 * 60 * 24)) + 1;
-
+        
         if (status) {
             const currentTime = new Date();
-            const approvalTime = new Date(leave.approvedAt);
+            let approvalTime
+            if(validUser.accountType==="HOD")approvalTime = new Date(leave.approvedAtHOD);
+            else if(validUser.accountType==="Registrar")approvalTime = new Date(leave.approvedAtRegistrar);
+            else if(validUser.accountType==="Director")approvalTime = new Date(leave.approvedAtDirector);
+            
             const timeDifference = (currentTime - approvalTime) / (1000 * 60);
             if (timeDifference < 5) {
-                await leaveModel.findByIdAndUpdate(leaveId, {approvedAt: null, approvedBy: null });
-                // approvedBy: null 
-                console.log(applicant._id)
-                console.log("hello",durationOfLeave)
+                if(validUser.accountType==="HOD")await leaveModel.findByIdAndUpdate(leaveId, {approvedAtHOD: null, approvedByHOD: null });
+                else if(validUser.accountType==="Registrar")await leaveModel.findByIdAndUpdate(leaveId, {approvedAtRegistrar: null, approvedByRegistrar: null });
+                else if(validUser.accountType==="Director")await leaveModel.findByIdAndUpdate(leaveId, {approvedAtDirector: null, approvedByDirector: null });
+                
                 if (applicant.unpaidLeaves===0) {
-                    await userModel.findByIdAndUpdate(applicant._id, { unpaidLeaves: 0, paidLeaves: validUser.paidLeaves + durationOfLeave });
+                    await userModel.findByIdAndUpdate(applicantId, { unpaidLeaves: 0, paidLeaves: applicant.paidLeaves + durationOfLeave });
                 }
                 else if(applicant.unpaidLeaves!==0 && applicant.paidLeaves===0){
                     durationOfLeave=durationOfLeave- applicant.unpaidLeaves;
-                    await userModel.findByIdAndUpdate(applicant._id, { unpaidLeaves: 0,
-                        paidLeaves: validUser.paidLeaves + durationOfLeave });
+                    await userModel.findByIdAndUpdate(applicantId, { unpaidLeaves: 0,
+                        paidLeaves: applicant.paidLeaves + durationOfLeave });
                 }
                 else if (applicant.paidLeaves===0 && applicant.unpaidLeaves===0) {
-                    await userModel.findByIdAndUpdate(applicant._id, {paidLeaves: validUser.paidLeaves + durationOfLeave});
+                    await userModel.findByIdAndUpdate(applicantId, {paidLeaves: applicant.paidLeaves + durationOfLeave});
                 }
             }
             else {
@@ -91,18 +97,18 @@ const approveLeave = async (user,leaveId,status) => {
                 };
             }
         } else {
-            await leaveModel.findByIdAndUpdate(leaveId, {approvedAt: new Date(), approvedBy: validUser });
-            // approvedBy: null 
+            // console.log(leaveId)
+            if(validUser.accountType==="HOD")await leaveModel.findByIdAndUpdate(leaveId, {approvedAtHOD: new Date(), approvedByHOD: validUser });
+            
             if (durationOfLeave > applicant.paidLeaves) {
                 durationOfLeave = durationOfLeave - applicant.paidLeaves;
-                await userModel.findByIdAndUpdate(applicant._id, { unpaidLeaves: validUser.unpaidLeaves + durationOfLeave, paidLeaves: 0 });
+                await userModel.findByIdAndUpdate(applicantId, { unpaidLeaves: applicant.unpaidLeaves + durationOfLeave, paidLeaves: 0 });
             }
             else {
-                console.log("paid leave",validUser.paidLeaves)
-                await userModel.findByIdAndUpdate(applicant._id, { paidLeaves: validUser.paidLeaves - durationOfLeave });
+                await userModel.findByIdAndUpdate(applicantId, { paidLeaves: applicant.paidLeaves - durationOfLeave });
             }
         }
-
+        
         return {
             success:true,
         }
@@ -456,7 +462,8 @@ exports.pendingApprovalHOD = async (req, res) => {
 // approval from hod 
 exports.approveLeavebyHOD = async (req, res) => {
     try{
-        const user=req.params.userId;
+        // user ---> person who will approve the leave 
+        const userId=req.params.userId;
         const leaveId=req.params.leaveId;
         const leave = await leaveModel.findById(leaveId);
         if (!leave) {
@@ -465,8 +472,11 @@ exports.approveLeavebyHOD = async (req, res) => {
                 message: "Leave not found"
             });
         }
+        const approval=leave.statusHOD;
+        const status=await approveLeave(userId,leaveId,approval);
+        if(approval)await leaveModel.findByIdAndUpdate(leaveId, {statusHOD: !approval, approvedByHOD: null});   
+        else await leaveModel.findByIdAndUpdate(leaveId, {statusHOD: !approval, approvedByHOD: userId});   
 
-        const status=await approveLeave(user,leave,leave.approvedByHOD);
 
         if(status.success){
             return res.status(200).json({
@@ -491,7 +501,7 @@ exports.approveLeavebyHOD = async (req, res) => {
 
 exports.approveLeavebyRegistrar = async (req, res) => {
     try{
-        const user=req.params.userId;
+        const userId=req.params.userId;
         const leaveId=req.params.leaveId;
         const leave = await leaveModel.findById(leaveId);
         if (!leave) {
@@ -501,7 +511,11 @@ exports.approveLeavebyRegistrar = async (req, res) => {
             });
         }
 
-        const status=await approveLeave(user,leave,leave.approvedByRegistrar);
+        const approval=leave.statusRegistrar
+        const status=await approveLeave(userId,leave,approval);
+        // agar pehle approval true tha toh ab false kar do and vice versa
+        if(approval)await leaveModel.findByIdAndUpdate(leaveId,{statusRegistrar:!approval,approvedByRegistrar:null})
+        else await leaveModel.findByIdAndUpdate(leaveId,{statusRegistrar:!approval,approvedByRegistrar:userId})
 
         if(status.success){
             return res.status(200).json({
@@ -526,7 +540,7 @@ exports.approveLeavebyRegistrar = async (req, res) => {
 
 exports.approveLeavebyDirector = async (req, res) => {
     try{
-        const user=req.params.userId;
+        const userId=req.params.userId;
         const leaveId=req.params.leaveId;
         const leave = await leaveModel.findById(leaveId);
         if (!leave) {
@@ -536,7 +550,10 @@ exports.approveLeavebyDirector = async (req, res) => {
             });
         }
 
-        const status=await approveLeave(user,leave,leave.approvedByRegistrar);
+        const approval=leave.statusDirector;
+        const status=await approveLeave(userId,leave,approval);
+        if(approval)await leaveModel.findByIdAndUpdate(leaveId,{statusDirector:approval,approvedByDirector:null})
+        else await leaveModel.findByIdAndUpdate(leaveId,{statusDirector:approval,approvedByDirector:userId})
 
         if(status.success){
             return res.status(200).json({

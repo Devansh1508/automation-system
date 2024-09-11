@@ -14,7 +14,7 @@ import EditLeave from "./pages/EditLeave";
 import PendingApprovals from "./pages/PendingApprovals";
 import { useSelector } from "react-redux";
 import ApproveLeave from "./pages/ApproveLeave";
-import ApprovedLeaves from "./pages/ApprovedLeaves";
+// import ApprovedLeaves from "./pages/ApprovedLeaves";
 import Community from "./pages/Community";
 import UserData from "./pages/UserData"
 
@@ -62,10 +62,10 @@ function App() {
           path={ `/community/userData/:id`}
           element={<UserData />}
         />
-        <Route
+        {/* <Route
           path={ `/ApprovedLeaves`}
           element={<ApprovedLeaves />}
-        />
+        /> */}
        
         {/* <Route
           path="/AppliedLeaves/:id"

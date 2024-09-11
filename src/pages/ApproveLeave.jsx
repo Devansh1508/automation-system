@@ -49,8 +49,13 @@ const LeaveCard = () => {
 
   const handleApprove = async () => {
     try {
+      let api=``;
+      if(user.accountType==="HOD")api=`http://localhost:4000/api/v1/leaves/approveLeavebyHOD/user/${userId}/leave/${leaveId}`;
+      else if(user.accountType==="Director")api=`http://localhost:4000/api/v1/leaves/approveLeavebyDirector/user/${userId}/leave/${leaveId}`;
+      else if(user.accountType==="Registrar")api=`http://localhost:4000/api/v1/leaves/approveLeavebyRegistrar/user/${userId}/leave/${leaveId}`
+      ;
       const response = await fetch(
-        `http://localhost:4000/api/v1/leaves/approveLeave/user/${userId}/leave/${leaveId}`,
+        api,
         {
           method: "PUT",
           headers: {
