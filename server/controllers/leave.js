@@ -11,7 +11,6 @@ const fetchLeave=async(user)=>{
         const userType=new Map([["HOD","approvedAtHOD"],["Registrar","approvedAtRegistrar"],["Director","approvedAtDirector"]]);
 
         const allLeaves = await leaveModel.find();
-        console.log(allLeaves)
         const filteredLeaves = allLeaves.filter((leave) => {
             const currentTime = new Date();
             currentTime.setUTCHours(0, 0, 0, 0);
@@ -20,8 +19,6 @@ const fetchLeave=async(user)=>{
             const approvedAt = new Date(leave[approvedAtField]);
             const from = new Date(leave.fromDate);
             const time = new Date();
-                    // console.log("hello from filter")
-                    // console.log("time",(time-approvedAt)/ 5 * 60 * 1000 );
             if ((time - approvedAt < 5 * 60 * 1000 ||
                  leave[approvedAtField] === null) 
                  && leave.approved !== null
@@ -30,7 +27,6 @@ const fetchLeave=async(user)=>{
                 return leave;
             }
         })
-        console.log("filtered leaves",filteredLeaves)
         return filteredLeaves;
 }
 
@@ -121,7 +117,6 @@ exports.createLeave = async (req, res) => {
         const user = decoded.id;
         // const user = req.body.id;
 
-        console.log(req);
         const validUser = await userModel.findById(user);
         if (!validUser) {
             return res.status(400).json({
@@ -139,7 +134,6 @@ exports.createLeave = async (req, res) => {
         const today = new Date();
         const toDateObj = new Date(toDate);
         const fromDateObj = new Date(fromDate);
-        console.log("obj", fromDateObj, "to", toDateObj, "today", today);
         if (fromDateObj.toISOString().split('T')[0] > toDateObj.toISOString().split('T')[0] || fromDateObj.toISOString().split('T')[0] < today.toISOString().split('T')[0] || toDateObj.toISOString().split('T')[0] < today.toISOString().split('T')[0]) {
             return res.status(400).json({
                 success: false,
@@ -151,7 +145,6 @@ exports.createLeave = async (req, res) => {
 
         await validUser.leaves.push(newLeave._id);
         await validUser.save();
-        console.log(newLeave);
         return res.status(200).json({
             success: true,
             message: "Leave created successfully",
@@ -180,14 +173,12 @@ exports.deleteLeave = async (req, res) => {
             })
         }
         const leaveId = req.params.id;
-        console.log("leave ID:", leaveId);
         await leaveModel.findByIdAndDelete(leaveId);
 
         await userModel.findByIdAndUpdate(user, {
             $pull: { leaves: leaveId }
         });
 
-        console.log("leave deleted");
         return res.status(200).json({
             success: true,
             message: "Leave deleted successfully",
@@ -267,70 +258,73 @@ exports.getMyLeave = async (req, res) => {
     }
 }
 
-exports.getApprovedLeaves = async (req, res) => {
-    try {
-        const token = req.headers.authorization.split(" ")[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = decoded.id;
+// will not be used 
+// exports.getApprovedLeaves = async (req, res) => {
+//     try {
+//         const token = req.headers.authorization.split(" ")[1];
+//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//         const user = decoded.id;
 
-        // const user = req.body.id;
+//         // const user = req.body.id;
 
-        const validUser = await userModel.findById(user);
-        if (!validUser) {
-            return res.status(400).json({
-                success: false,
-                message: "User not found"
-            })
-        }
+//         const validUser = await userModel.findById(user);
+//         if (!validUser) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "User not found"
+//             })
+//         }
 
-        const currentDate = new Date();
-        const fetchedLeaves = await leaveModel.find({ approved: true, });
-        let filteredLeaves = [];
-        fetchedLeaves.filter(async (leave) => {
-            const currentTime = new Date();
-            const approvedAt = leave.approvedAt;
-            // if (currentTime - leave.approvedAt > 5 * 60 * 1000 && leave.approvedAt !== null) {
-            filteredLeaves.push(leave)
-            return leave;
-            // }
-        })
-        // console.log(fetchedLeaves)
+//         const currentDate = new Date();
+//         const fetchedLeaves = await leaveModel.find({ approved: true, });
+//         let filteredLeaves = [];
+//         fetchedLeaves.filter(async (leave) => {
+//             const currentTime = new Date();
+//             const approvedAt = leave.approvedAt;
+//             // if (currentTime - leave.approvedAt > 5 * 60 * 1000 && leave.approvedAt !== null) {
+//             filteredLeaves.push(leave)
+//             return leave;
+//             // }
+//         })
+//         // console.log(fetchedLeaves)
 
-        let leaveMap = new Map();
-        for (const leave of filteredLeaves) {
-            const appliedUser = await userModel.findById(leave.user);
-            const data = { ...leave.toObject(), firstName: appliedUser.firstName, lastName: appliedUser.lastName, email: appliedUser.email };
-            const approvedDate = leave.approvedAt.toDateString();
+//         let leaveMap = new Map();
+//         for (const leave of filteredLeaves) {
+//             const appliedUser = await userModel.findById(leave.user);
+//             const data = { ...leave.toObject(), firstName: appliedUser.firstName, lastName: appliedUser.lastName, email: appliedUser.email };
+//             const approvedDate = leave.approvedAt.toDateString();
 
-            if (!leaveMap.has(approvedDate)) {
-                leaveMap.set(approvedDate, [data]);
-            } else {
-                leaveMap.get(approvedDate).push(data);
-            }
-        }
-        // console.log(leaveMap.get('Mon Jul 15 2024'));
+//             if (!leaveMap.has(approvedDate)) {
+//                 leaveMap.set(approvedDate, [data]);
+//             } else {
+//                 leaveMap.get(approvedDate).push(data);
+//             }
+//         }
+//         // console.log(leaveMap.get('Mon Jul 15 2024'));
 
 
-        let leaveData = [];
-        leaveMap.forEach(function (value, key) {
-            const temp = [key, value]
-            leaveData.push(temp);
-        });
+//         let leaveData = [];
+//         leaveMap.forEach(function (value, key) {
+//             const temp = [key, value]
+//             leaveData.push(temp);
+//         });
 
-        return res.status(200).json({
-            success: true,
-            message: "Leave fetched successfully",
-            data: leaveData
-        })
-    } catch (err) {
-        return res.status(500).json({
-            success: false,
-            message: "error occurred while fetching leave"
-        })
-    }
-}
+//         return res.status(200).json({
+//             success: true,
+//             message: "Leave fetched successfully",
+//             data: leaveData
+//         })
+//     } catch (err) {
+//         return res.status(500).json({
+//             success: false,
+//             message: "error occurred while fetching leave"
+//         })
+//     }
+// }
 
 //just fetching leaves for approval
+
+
 exports.pendingApprovalDirector = async (req, res) => {
     try {
         const user = req.params.id;
@@ -443,7 +437,6 @@ exports.pendingApprovalHOD = async (req, res) => {
             })
         )
         filteredLeaves=filteredLeaves.filter(leave=>leave!==null);
-        console.log("filtered",filteredLeaves);
 
         return res.status(200).json({
             success: true,
@@ -481,6 +474,7 @@ exports.approveLeavebyHOD = async (req, res) => {
         if(status.success){
             return res.status(200).json({
                 success: true,
+                status: !approval,
                 message: status.message,
             });
         }
@@ -613,8 +607,6 @@ exports.approveLeave = async (req, res) => {
             const timeDifference = (currentTime - approvalTime) / (1000 * 60);
             if (timeDifference < 5) {
                 await leaveModel.findByIdAndUpdate(leaveId, { approved: false, approvedAt: null, approvedBy: null });
-                console.log(applicant._id)
-                console.log("hello",durationOfLeave)
                 if (applicant.unpaidLeaves===0) {
                     await userModel.findByIdAndUpdate(applicant._id, { unpaidLeaves: 0, paidLeaves: validUser.paidLeaves + durationOfLeave });
                 }
@@ -640,7 +632,6 @@ exports.approveLeave = async (req, res) => {
                 await userModel.findByIdAndUpdate(applicant._id, { unpaidLeaves: validUser.unpaidLeaves + durationOfLeave, paidLeaves: 0 });
             }
             else {
-                console.log("paid leave",validUser.paidLeaves)
                 await userModel.findByIdAndUpdate(applicant._id, { paidLeaves: validUser.paidLeaves - durationOfLeave });
             }
         }
@@ -684,7 +675,6 @@ exports.getLeaveRequests = async (req, res) => {
             data: leaveRequests
         });
     } catch (err) {
-        console.error(err);
         res.status(500).json({ message: 'error occured while fetching leaves' });
     }
 };

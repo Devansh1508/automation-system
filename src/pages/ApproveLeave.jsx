@@ -66,7 +66,7 @@ const LeaveCard = () => {
         }
       );
       const data = await response.json();
-      console.log("data:", data);
+      console.log("data from api:", data);
 
       if (data.success) {
         if (data.status === true) {
@@ -97,7 +97,18 @@ const LeaveCard = () => {
             >
               <h2 className="text-2xl font-bold mb-4">Leave Details</h2>
             </div>
-            <Status leave={leave} />
+            {/* {
+              (user.accountType==="HOD")&&<Status leave={leave} status={leave.statusHOD}/>
+            }
+            {
+              (user.accountType==="Registrar")&&<Status leave={leave} status={leave.statusRegistrar}/>
+            }
+            {
+              (user.accountType==="Director")&&<Status leave={leave} status={leave.statusDirector}/>
+            } */}
+
+<Status status={leave.statusHOD}/>
+            
           </div>
           <br />
           <div className="mb-4">

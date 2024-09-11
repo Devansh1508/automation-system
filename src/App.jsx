@@ -35,9 +35,9 @@ function App() {
         <Route
           path="/Login"
           element={
-            // <OpenRoute>
+            <OpenRoute>
               <Login />
-            // </OpenRoute>
+            </OpenRoute>
           }
         />
         <Route
