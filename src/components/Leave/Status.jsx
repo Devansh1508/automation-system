@@ -3,7 +3,6 @@ import React from 'react'
 const Status = ({status}) => {
   return (
     <div>
-      {console.log("status",status)}
       <div className={`mb-4 gap-4 flex items-center rounded-lg ${
                     status ? "bg-green-500" : "bg-[#cd1b1bd7]" 
                   }`}>

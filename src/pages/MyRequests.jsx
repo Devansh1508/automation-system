@@ -59,7 +59,6 @@ const MyRequests = () => {
         leaves.length !== 0 && (
           <div>
             <div className="flex absolute items-center justify-center w-[100vw] h-[90vh] flex-col">
-            {/* <div className="font-medium font-[oswald] text-xl"> No leave applications found</div> */}
             <div className="w-[40vw] opacity-30">
               <img src={noLeave} alt="" />
             </div>

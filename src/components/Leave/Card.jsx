@@ -1,5 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";  
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import MyRequestStatus from "../common/MyRequestStatus";
 
 const formatDate = (date) => new Date(date).toLocaleDateString();
 
@@ -12,6 +14,35 @@ const onDelete = () => {
 };
 
 const Card = (leave) => {
+  const { user } = useSelector((state) => state.profile);
+
+  // certain approvals 
+  const renderApprovedByHOD = () => {
+    if ((user.accountType === "Assistant Registrar" || user.accountType==="Other") && leave.leave.statusHOD) {
+      return (
+        <p className="text-gray-700 text-base">
+          <strong>Approved By HOD:</strong> {leave.leave.approvedByHOD}
+        </p>
+      );
+    }
+    return null;
+  };
+
+  const renderApprovedByRegistrar = () => {
+    if (
+      user.accountType === "Assistant Registrar" &&
+      leave.leave.statusRegistrar
+    ) {
+      return (
+        <p className="text-gray-700 text-base">
+          <strong>Approved By Registrar:</strong>
+          {leave.leave.approvedByRegistrar}
+        </p>
+      );
+    }
+    return null;
+  };
+
   return (
     <div>
       <Link to={`/EditLeave/${leave.leave._id}`}>
@@ -32,14 +63,9 @@ const Card = (leave) => {
           <p className="text-gray-700 text-base">
             <strong>Applied On:</strong> {formatDate(leave.leave.createdAt)}
           </p>
-          <p
-            className={`text-base ${
-              leave.leave.approved ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            <strong>Status:</strong>{" "}
-            {leave.leave.approved ? "Approved" : "Not Approved"}
-          </p>
+          {renderApprovedByHOD()}
+          {renderApprovedByRegistrar()}
+          <MyRequestStatus leave={leave} />
         </div>
       </Link>
     </div>

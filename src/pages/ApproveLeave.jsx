@@ -15,6 +15,10 @@ const LeaveCard = () => {
   const formatDate = (date) => new Date(date).toLocaleDateString();
   const [approve, setApprove] = useState(false);
   const [leave, setLeave] = useState({});
+  const [HOD,setHOD]=useState();
+  const [registrar,setRegistrar]=useState();
+  const [director,setDirector]=useState();
+
   const currentTime = new Date();
 
   useEffect(() => {
@@ -34,10 +38,12 @@ const LeaveCard = () => {
         }
       );
       const data = await response.json();
-
       if (data.success) {
         setLeave(data.data.leave);
         setApplicant(data.data.userRequestedForLeave);
+        setHOD(data.data.HOD)
+        setDirector(data.data.Director)
+        setRegistrar(data.data.Registrar)
       } else {
         errorMessage(data.message);
       }
@@ -49,22 +55,21 @@ const LeaveCard = () => {
 
   const handleApprove = async () => {
     try {
-      let api=``;
-      if(user.accountType==="HOD")api=`http://localhost:4000/api/v1/leaves/approveLeavebyHOD/user/${userId}/leave/${leaveId}`;
-      else if(user.accountType==="Director")api=`http://localhost:4000/api/v1/leaves/approveLeavebyDirector/user/${userId}/leave/${leaveId}`;
-      else if(user.accountType==="Registrar")api=`http://localhost:4000/api/v1/leaves/approveLeavebyRegistrar/user/${userId}/leave/${leaveId}`
-      ;
-      const response = await fetch(
-        api,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ applicant }),
-        }
-      );
+      let api = ``;
+      if (user.accountType === "HOD")
+        api = `http://localhost:4000/api/v1/leaves/approveLeavebyHOD/user/${userId}/leave/${leaveId}`;
+      else if (user.accountType === "Director")
+        api = `http://localhost:4000/api/v1/leaves/approveLeavebyDirector/user/${userId}/leave/${leaveId}`;
+      else if (user.accountType === "Registrar")
+        api = `http://localhost:4000/api/v1/leaves/approveLeavebyRegistrar/user/${userId}/leave/${leaveId}`;
+      const response = await fetch(api, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ applicant }),
+      });
       const data = await response.json();
       console.log("data from api:", data);
 
@@ -97,7 +102,8 @@ const LeaveCard = () => {
             >
               <h2 className="text-2xl font-bold mb-4">Leave Details</h2>
             </div>
-            {/* {
+
+            {
               (user.accountType==="HOD")&&<Status leave={leave} status={leave.statusHOD}/>
             }
             {
@@ -105,9 +111,8 @@ const LeaveCard = () => {
             }
             {
               (user.accountType==="Director")&&<Status leave={leave} status={leave.statusDirector}/>
-            } */}
+            }
 
-<Status status={leave.statusHOD}/>
             
           </div>
           <br />
@@ -146,7 +151,6 @@ const LeaveCard = () => {
             </label>
             <p className="text-gray-700">{leave.nature}</p>
           </div>
-          <br />
           <div className="mb-4">
             <label className="block text-gray-700 font-bold">
               Period of Leave:
@@ -208,6 +212,59 @@ const LeaveCard = () => {
             <label className="block text-gray-700 font-bold">Applied On:</label>
             <p className="text-gray-700">{formatDate(leave.createdAt)}</p>
           </div>
+
+          {/* jisne approval diya  */}
+          {leave.approvedByHOD != null && (
+            <div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">
+                Approved By HOD:
+              </label>
+              <p className="text-gray-700">{HOD.name}</p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">
+                HOD email:
+              </label>
+              <p className="text-gray-700">{HOD.email}</p>
+            </div>
+            </div>
+          )}
+
+          {leave.approvedByRegistrar != null && (
+            <div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">
+                Approved By Registrar:
+              </label>
+              <p className="text-gray-700">{registrar.name}</p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">
+                Registrar email:
+              </label>
+              <p className="text-gray-700">{registrar.email}</p>
+            </div>
+            </div>
+          )}
+
+          {leave.approvedByDirector != null && (
+            <div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">
+                Approved By Director:
+              </label>
+              <p className="text-gray-700">{director.name}</p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">
+                Director email:
+              </label>
+              <p className="text-gray-700">{director.email}</p>
+            </div>
+            </div>
+          )}
+
           <div className="flex justify-between">
             <div>
               <button

@@ -90,6 +90,10 @@ const leaveFormSchema = new Schema({
     type: Boolean,
     default: 0
   },
+  approved:{
+    type: Boolean,
+    default: 0
+  }
 }, {
   timestamps: true
 });

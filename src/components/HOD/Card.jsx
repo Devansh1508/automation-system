@@ -75,11 +75,17 @@ const Card = (leave) => {
           </p>
           <p
             className={`text-base ${
-              leave.leave.approved ? "text-green-500" : "text-red-500"
+              (user.accountType === "HOD" &&(leave.leave.statusHOD ? "text-green-500" : "text-red-500")||
+              user.accountType === "Registrar" &&(leave.leave.statusRegistrar ? "text-green-500" : "text-red-500")||
+              user.accountType === "Director" &&(leave.leave.statusDirector ? "text-green-500" : "text-red-500"))
             }`}
           >
             <strong>Status:</strong>{" "}
-            {leave.leave.approved ? "Approved" : "Not Approved"}
+            {
+            (user.accountType === "HOD" &&(leave.leave.statusHOD ? "Approved" : "Not Approved")||
+            user.accountType === "Registrar" &&(leave.leave.statusRegistrar ? "Approved" : "Not Approved")||
+            user.accountType === "Director" &&(leave.leave.statusDirector ? "Approved" : "Not Approved"))
+            }
           </p>
         </div>
       </Link>
